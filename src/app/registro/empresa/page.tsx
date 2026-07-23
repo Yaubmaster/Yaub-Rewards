@@ -46,23 +46,27 @@ export default function RegistroEmpresa() {
   const [capacitacion, setCapacitacion] = useState<CapacitacionTipo>('en_linea');
   const [cargando, setCargando] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [aprobada, setAprobada] = useState(false);
 
   const registrarEmpresaConSesion = async () => {
     const supabase = supabaseBrowser();
     const comisionNum = parseFloat(comision.replace(/[^\d.]/g, '')) || 0;
-    const { error: rpcErr } = await supabase.rpc('registrar_empresa', {
-      p_nombre: nombre,
-      p_descripcion: giro,
-      p_producto: producto,
-      p_comision_mxn: comisionNum,
-      p_condicion: condicion,
-      p_capacitacion: capacitacion,
-    });
+    const { data, error: rpcErr } = await supabase
+      .rpc('registrar_empresa', {
+        p_nombre: nombre,
+        p_descripcion: giro,
+        p_producto: producto,
+        p_comision_mxn: comisionNum,
+        p_condicion: condicion,
+        p_capacitacion: capacitacion,
+      })
+      .single();
     setCargando(false);
-    if (rpcErr) {
+    if (rpcErr || !data) {
       setError('No se pudo registrar la empresa. Intenta de nuevo.');
       return;
     }
+    setAprobada((data as { estado?: string }).estado === 'autorizada');
     setPaso('revision');
   };
 
@@ -211,12 +215,24 @@ export default function RegistroEmpresa() {
 
         {paso === 'revision' && (
           <div className="animate-fadeUp text-center">
-            <div className="mx-auto flex h-[72px] w-[72px] animate-pop items-center justify-center rounded-full" style={{ background: 'rgba(245,158,11,.12)' }}>
-              <Icon d={ICON_PATHS.clock} size={32} stroke="#F59E0B" strokeWidth={2} />
+            <div
+              className="mx-auto flex h-[72px] w-[72px] animate-pop items-center justify-center rounded-full"
+              style={{ background: aprobada ? 'rgba(16,185,129,.12)' : 'rgba(245,158,11,.12)' }}
+            >
+              <Icon
+                d={aprobada ? ICON_PATHS.check : ICON_PATHS.clock}
+                size={32}
+                stroke={aprobada ? '#10B981' : '#F59E0B'}
+                strokeWidth={2}
+              />
             </div>
-            <h1 className="mt-[18px] text-[26px] font-extrabold tracking-tight">En revisión</h1>
+            <h1 className="mt-[18px] text-[26px] font-extrabold tracking-tight">
+              {aprobada ? '¡Empresa autorizada!' : 'En revisión'}
+            </h1>
             <p className="mt-2 text-[15px] leading-relaxed text-slate2" style={{ textWrap: 'pretty' }}>
-              Estamos verificando tu empresa. En menos de 24 h quedarás autorizada en el marketplace.
+              {aprobada
+                ? 'Tu empresa ya aparece en el marketplace y los freelancers pueden suscribirse a tu oferta desde ahora.'
+                : 'Detectamos contenido que requiere revisión manual. En menos de 24 h te confirmamos si queda autorizada en el marketplace.'}
             </p>
             <button
               onClick={() => {
