@@ -6,6 +6,7 @@
 --  Dashboard → Settings → API → Exposed schemas)
 alter role authenticator set pgrst.db_schemas = 'public, storage, graphql_public, rewards';
 notify pgrst, 'reload config';
+notify pgrst, 'reload schema';
 
 -- Seed: admin inicial
 insert into rewards.admins (email)

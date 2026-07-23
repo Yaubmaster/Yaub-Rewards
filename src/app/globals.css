@@ -1,0 +1,50 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html,
+body {
+  background: #ffffff;
+  color: #0a0a0f;
+  -webkit-font-smoothing: antialiased;
+}
+
+.input-yaub {
+  @apply w-full rounded-[14px] border border-line bg-white px-4 py-[14px] text-[15px] outline-none transition-shadow;
+}
+.input-yaub:focus {
+  border-color: #00d4ff;
+  box-shadow: 0 0 0 3px rgba(0, 212, 255, 0.12);
+}
+.input-yaub--violet:focus {
+  border-color: #8b5cf6;
+  box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.12);
+}
+
+.btn-gradient {
+  @apply cursor-pointer rounded-2xl bg-badge text-center font-bold text-white transition-transform;
+}
+.btn-gradient:hover {
+  transform: translateY(-2px);
+}
+.btn-gradient:active {
+  transform: scale(0.98);
+}
+
+.text-gradient {
+  background: linear-gradient(135deg, #00d4ff, #8b5cf6);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.card {
+  @apply rounded-[20px] border border-line bg-white;
+  box-shadow: 0 2px 8px rgba(10, 10, 15, 0.04);
+}
+
+.shimmer {
+  background: linear-gradient(90deg, #f1f5f9 25%, #f8fafc 40%, #f1f5f9 55%);
+  background-size: 800px 100%;
+  animation: shimmer 1.1s linear infinite;
+}
