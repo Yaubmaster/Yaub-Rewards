@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+html,body{margin:0;padding:0;background:#0A0A0F;font-family:'Inter',-apple-system,'SF Pro Display',system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+a{color:#0EA5E9;text-decoration:none}a:hover{color:#8B5CF6}
+@keyframes orbFloat{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(40px,-30px) scale(1.08)}}
+@keyframes orbFloat2{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(-50px,25px) scale(.94)}}
+@keyframes riseIn{from{opacity:0;transform:translateY(26px)}to{opacity:1;transform:translateY(0)}}
+@keyframes pulseDot{0%,100%{opacity:1}50%{opacity:.3}}
+@keyframes dashMove{to{background-position:-24px 0}}
+</style>
+</helmet>
+<x-import component-from-global-scope="deck-stage" from="./deck-stage.js" width="1920" height="1080" hint-size="100%,100%">
+
+<section data-label="Portada" data-speaker-notes="Bienvenida. Yaub Rewards: la red de vendedores freelance impulsada por los agentes de IA de Yaub." style="background:#FFFFFF;overflow:hidden;display:flex;align-items:center;justify-content:center">
+  <div style="position:absolute;width:700px;height:700px;border-radius:50%;background:radial-gradient(circle,rgba(0,212,255,.14),transparent 65%);top:-220px;left:-160px;animation:orbFloat 9s ease-in-out infinite"></div>
+  <div style="position:absolute;width:640px;height:640px;border-radius:50%;background:radial-gradient(circle,rgba(139,92,246,.13),transparent 65%);bottom:-200px;right:-140px;animation:orbFloat2 11s ease-in-out infinite"></div>
+  <div style="position:relative;text-align:center;animation:riseIn .8s ease both">
+    <img src="uploads/Yaub.icon.black.png" alt="Yaub" style="width:120px;height:auto;margin:0 auto 36px;display:block">
+    <h1 style="margin:0;font-size:110px;font-weight:800;letter-spacing:-0.03em;color:#0A0A0F;line-height:1.05"><span>Yaub</span> <span style="background:linear-gradient(135deg,#00D4FF,#8B5CF6);-webkit-background-clip:text;background-clip:text;color:transparent">Rewards</span></h1>
+    <p style="margin:36px 0 0;font-size:42px;font-weight:600;color:#0A0A0F;letter-spacing:-0.01em">Vende con agentes de IA. Cobra por cada referido.</p>
+    <p style="margin:18px 0 0;font-size:28px;font-weight:400;color:#94A3B8">La red de vendedores freelance impulsada por Yaub IA.</p>
+  </div>
+</section>
+
+<section data-label="El problema" data-speaker-notes="Dos lados del mismo problema: empresas sin fuerza de venta escalable y personas que quieren ingresos extra sin fricción." style="background:#F8FAFC;display:flex;flex-direction:column;padding:110px 120px 90px">
+  <p style="margin:0;font-size:26px;font-weight:700;letter-spacing:.14em;color:#94A3B8">EL PROBLEMA</p>
+  <h2 style="margin:24px 0 0;font-size:66px;font-weight:800;letter-spacing:-0.03em;color:#0A0A0F;line-height:1.15;max-width:1500px">Las empresas necesitan vendedores. Los vendedores necesitan <span style="background:linear-gradient(135deg,#00D4FF,#8B5CF6);-webkit-background-clip:text;background-clip:text;color:transparent">productos que dejen dinero</span>.</h2>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:40px;margin-top:70px">
+    <div style="background:#fff;border:1px solid #E2E8F0;border-radius:20px;padding:56px;box-shadow:0 4px 24px rgba(10,10,15,.05);transition:all .25s ease" style-hover="transform:translateY(-4px);box-shadow:0 16px 40px rgba(0,212,255,.12)">
+      <div style="width:64px;height:64px;border-radius:16px;background:rgba(0,212,255,.1);display:flex;align-items:center;justify-content:center"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#0EA5E9" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M3 9l1.5-5h15L21 9 M5 9v12h14V9 M9 21v-6h6v6"></path></svg></div>
+      <h3 style="margin:32px 0 0;font-size:38px;font-weight:700;color:#0A0A0F;letter-spacing:-0.02em">Empresas</h3>
+      <p style="margin:18px 0 0;font-size:29px;color:#475569;line-height:1.5;text-wrap:pretty">Tienen productos que venden bien, pero no una fuerza de venta que escale sin nómina ni sucursales.</p>
+    </div>
+    <div style="background:#fff;border:1px solid #E2E8F0;border-radius:20px;padding:56px;box-shadow:0 4px 24px rgba(10,10,15,.05);transition:all .25s ease" style-hover="transform:translateY(-4px);box-shadow:0 16px 40px rgba(139,92,246,.12)">
+      <div style="width:64px;height:64px;border-radius:16px;background:rgba(139,92,246,.1);display:flex;align-items:center;justify-content:center"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#8B5CF6" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2 M12 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8"></path></svg></div>
+      <h3 style="margin:32px 0 0;font-size:38px;font-weight:700;color:#0A0A0F;letter-spacing:-0.02em">Personas</h3>
+      <p style="margin:18px 0 0;font-size:29px;color:#475569;line-height:1.5;text-wrap:pretty">Quieren un ingreso extra, pero sin inventario, sin cobrar, sin papeleo y sin procesos complicados.</p>
+    </div>
+  </div>
+</section>
+
+<section data-label="La idea" data-speaker-notes="La mayoría de las ventas de Yaub ya pasan por agentes de IA. El vendedor solo guía; el agente cierra y captura el código." style="background:#FFFFFF;display:flex;flex-direction:column;justify-content:center;padding:110px 120px 90px">
+  <p style="margin:0;font-size:26px;font-weight:700;letter-spacing:.14em;color:#94A3B8">LA IDEA</p>
+  <h2 style="margin:24px 0 0;font-size:78px;font-weight:800;letter-spacing:-0.03em;color:#0A0A0F;line-height:1.12;max-width:1560px">Tú recomiendas. <span style="background:linear-gradient(135deg,#00D4FF,#8B5CF6);-webkit-background-clip:text;background-clip:text;color:transparent">El agente de IA cierra la venta.</span> Tú cobras.</h2>
+  <div style="display:flex;flex-direction:column;gap:30px;margin-top:76px;max-width:1300px">
+    <div style="display:flex;gap:28px;align-items:baseline"><span style="font-size:30px;font-weight:800;color:#00D4FF;flex-shrink:0;width:44px">01</span><p style="margin:0;font-size:33px;color:#475569;line-height:1.5">La mayoría de las ventas de Yaub se generan a través de agentes de IA.</p></div>
+    <div style="display:flex;gap:28px;align-items:baseline"><span style="font-size:30px;font-weight:800;color:#0EA5E9;flex-shrink:0;width:44px">02</span><p style="margin:0;font-size:33px;color:#475569;line-height:1.5">El vendedor solo guía a la gente al agente — sin cerrar, sin cobrar, sin papeleo.</p></div>
+    <div style="display:flex;gap:28px;align-items:baseline"><span style="font-size:30px;font-weight:800;color:#8B5CF6;flex-shrink:0;width:44px">03</span><p style="margin:0;font-size:33px;color:#475569;line-height:1.5">Al final, el agente pregunta "¿alguien te recomendó?" y el cliente pone el código del vendedor.</p></div>
+  </div>
+</section>
+
+<section data-label="El código único" data-speaker-notes="El código es el activo del vendedor: corto, memorable, fácil de decir en voz alta a un agente." style="background:#F8FAFC;display:flex;align-items:center;padding:110px 120px 90px;gap:100px">
+  <div style="flex:1">
+    <p style="margin:0;font-size:26px;font-weight:700;letter-spacing:.14em;color:#94A3B8">EL CÓDIGO ÚNICO</p>
+    <h2 style="margin:24px 0 0;font-size:64px;font-weight:800;letter-spacing:-0.03em;color:#0A0A0F;line-height:1.15">Ese código es <span style="background:linear-gradient(135deg,#00D4FF,#8B5CF6);-webkit-background-clip:text;background-clip:text;color:transparent">tu negocio</span>.</h2>
+    <p style="margin:30px 0 0;font-size:31px;color:#475569;line-height:1.55;max-width:640px;text-wrap:pretty">Al registrarte, Yaub Rewards genera tu código único de representante. Corto, fácil de decir y de recordar.</p>
+  </div>
+  <div style="flex-shrink:0;position:relative">
+    <div style="position:absolute;inset:-60px;background:radial-gradient(circle,rgba(0,212,255,.16),transparent 70%);border-radius:50%"></div>
+    <div style="position:relative;width:560px;background:linear-gradient(135deg,#00D4FF,#8B5CF6);border-radius:32px;padding:3px;box-shadow:0 30px 80px rgba(139,92,246,.3)">
+      <div style="background:#fff;border-radius:29px;padding:64px 48px;text-align:center">
+        <p style="margin:0;font-size:24px;font-weight:600;color:#94A3B8;letter-spacing:.16em">TU CÓDIGO ÚNICO</p>
+        <p style="margin:20px 0 0;font-size:108px;font-weight:800;letter-spacing:-0.02em;line-height:1;background:linear-gradient(135deg,#00D4FF,#8B5CF6);-webkit-background-clip:text;background-clip:text;color:transparent">JACO-01</p>
+        <div style="display:inline-flex;align-items:center;gap:12px;margin-top:36px;border:1px solid #E2E8F0;border-radius:16px;padding:16px 32px;cursor:pointer;transition:all .2s ease" style-hover="border-color:#00D4FF;box-shadow:0 6px 18px rgba(0,212,255,.15)">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#475569" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M8 8h12v12H8z M16 8V4H4v12h4"></path></svg>
+          <span style="font-size:25px;font-weight:600;color:#475569">Copiar</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section data-label="Cómo funciona" data-speaker-notes="El flujo completo con Yaub Móvil: recomendación, portabilidad con el agente, captura del código, $100 pendientes, liberación con la primera recarga." style="background:#FFFFFF;display:flex;flex-direction:column;padding:110px 100px 90px">
+  <p style="margin:0;font-size:26px;font-weight:700;letter-spacing:.14em;color:#94A3B8">CÓMO FUNCIONA</p>
+  <h2 style="margin:24px 0 0;font-size:64px;font-weight:800;letter-spacing:-0.03em;color:#0A0A0F">Del "te recomiendo" al <span style="background:linear-gradient(135deg,#00D4FF,#8B5CF6);-webkit-background-clip:text;background-clip:text;color:transparent">dinero liberado</span></h2>
+  <div style="position:relative;margin-top:100px">
+    <div style="position:absolute;top:36px;left:80px;right:80px;height:5px;border-radius:999px;background:#F1F5F9"></div>
+    <div style="position:absolute;top:36px;left:80px;right:80px;height:5px;border-radius:999px;background:linear-gradient(90deg,#00D4FF,#8B5CF6);transform-origin:left;animation:riseIn 0s;clip-path:inset(0 0 0 0)"></div>
+    <div style="position:relative;display:grid;grid-template-columns:repeat(5,1fr);gap:28px">
+      <div style="text-align:center;animation:riseIn .6s ease .1s both">
+        <div style="width:76px;height:76px;border-radius:50%;background:linear-gradient(135deg,#00D4FF,#8B5CF6);color:#fff;font-size:30px;font-weight:800;display:flex;align-items:center;justify-content:center;margin:0 auto;box-shadow:0 10px 26px rgba(0,212,255,.3)">1</div>
+        <p style="margin:26px 0 0;font-size:26px;font-weight:600;color:#0A0A0F;line-height:1.4">Recomiendas Yaub Móvil</p>
+      </div>
+      <div style="text-align:center;animation:riseIn .6s ease .3s both">
+        <div style="width:76px;height:76px;border-radius:50%;background:linear-gradient(135deg,#00D4FF,#8B5CF6);color:#fff;font-size:30px;font-weight:800;display:flex;align-items:center;justify-content:center;margin:0 auto;box-shadow:0 10px 26px rgba(0,212,255,.3)">2</div>
+        <p style="margin:26px 0 0;font-size:26px;font-weight:600;color:#0A0A0F;line-height:1.4">El cliente hace su portabilidad con el agente de IA</p>
+      </div>
+      <div style="text-align:center;animation:riseIn .6s ease .5s both">
+        <div style="width:76px;height:76px;border-radius:50%;background:linear-gradient(135deg,#00D4FF,#8B5CF6);color:#fff;font-size:30px;font-weight:800;display:flex;align-items:center;justify-content:center;margin:0 auto;box-shadow:0 10px 26px rgba(0,212,255,.3)">3</div>
+        <p style="margin:26px 0 0;font-size:26px;font-weight:600;color:#0A0A0F;line-height:1.4">El agente captura tu código</p>
+      </div>
+      <div style="text-align:center;animation:riseIn .6s ease .7s both">
+        <div style="width:76px;height:76px;border-radius:50%;background:#fff;border:3px solid #F59E0B;color:#F59E0B;font-size:30px;font-weight:800;display:flex;align-items:center;justify-content:center;margin:0 auto">4</div>
+        <p style="margin:26px 0 0;font-size:26px;font-weight:600;color:#0A0A0F;line-height:1.4">Se registran $100 MXN a tu favor</p>
+        <span style="display:inline-block;margin-top:14px;font-size:24px;font-weight:700;color:#F59E0B;background:rgba(245,158,11,.12);padding:8px 24px;border-radius:999px">Pendiente</span>
+      </div>
+      <div style="text-align:center;animation:riseIn .6s ease .9s both">
+        <div style="width:76px;height:76px;border-radius:50%;background:#fff;border:3px solid #10B981;color:#10B981;font-size:30px;font-weight:800;display:flex;align-items:center;justify-content:center;margin:0 auto">5</div>
+        <p style="margin:26px 0 0;font-size:26px;font-weight:600;color:#0A0A0F;line-height:1.4">Primera recarga: se liberan los $100</p>
+        <span style="display:inline-block;margin-top:14px;font-size:24px;font-weight:700;color:#10B981;background:rgba(16,185,129,.12);padding:8px 24px;border-radius:999px">Liberado</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section data-label="Primer cliente" data-speaker-notes="Arrancamos con producto propio: Yaub Móvil paga $100 MXN por portabilidad referida. El agente hace todo el trabajo pesado." style="background:#F8FAFC;display:flex;align-items:center;padding:110px 120px 90px;gap:100px">
+  <div style="flex:1">
+    <p style="margin:0;font-size:26px;font-weight:700;letter-spacing:.14em;color:#94A3B8">PRIMER CLIENTE</p>
+    <div style="display:flex;align-items:center;gap:22px;margin-top:28px">
+      <div style="width:76px;height:76px;border-radius:20px;background:#0A0A0F;color:#fff;font-size:34px;font-weight:800;display:flex;align-items:center;justify-content:center">Y</div>
+      <h2 style="margin:0;font-size:60px;font-weight:800;letter-spacing:-0.03em;color:#0A0A0F">Yaub Móvil</h2>
+    </div>
+    <p style="margin:32px 0 0;font-size:31px;color:#475569;line-height:1.55;max-width:640px">$100 MXN por cada portabilidad referida. El cliente conserva su número.</p>
+    <div style="display:flex;flex-direction:column;gap:22px;margin-top:44px">
+      <div style="display:flex;align-items:center;gap:18px"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#10B981" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round"><path d="M4 12.5 9.5 18 20 6"></path></svg><span style="font-size:29px;color:#475569">Sin inventario</span></div>
+      <div style="display:flex;align-items:center;gap:18px"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#10B981" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round"><path d="M4 12.5 9.5 18 20 6"></path></svg><span style="font-size:29px;color:#475569">Sin cobrar tú</span></div>
+      <div style="display:flex;align-items:center;gap:18px"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#10B981" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round"><path d="M4 12.5 9.5 18 20 6"></path></svg><span style="font-size:29px;color:#475569">Sin papeleo — el agente hace todo</span></div>
+    </div>
+  </div>
+  <div style="flex-shrink:0;text-align:center;position:relative">
+    <div style="position:absolute;inset:-80px;background:radial-gradient(circle,rgba(139,92,246,.14),transparent 70%)"></div>
+    <p style="position:relative;margin:0;font-size:220px;font-weight:800;letter-spacing:-0.04em;line-height:1;background:linear-gradient(135deg,#00D4FF,#8B5CF6);-webkit-background-clip:text;background-clip:text;color:transparent">$100</p>
+    <p style="position:relative;margin:10px 0 0;font-size:40px;font-weight:700;color:#0A0A0F;letter-spacing:.06em">MXN</p>
+    <p style="position:relative;margin:12px 0 0;font-size:26px;color:#94A3B8">por portabilidad referida</p>
+  </div>
+</section>
+
+<section data-label="Tu dashboard" data-speaker-notes="El freelancer ve todo en su app: liberadas vs pendientes, referidos con estatus y actividad. Demo en vivo disponible." style="background:#FFFFFF;display:flex;flex-direction:column;padding:100px 120px 80px">
+  <div style="display:flex;justify-content:space-between;align-items:flex-end">
+    <div>
+      <p style="margin:0;font-size:26px;font-weight:700;letter-spacing:.14em;color:#94A3B8">TU DASHBOARD</p>
+      <h2 style="margin:20px 0 0;font-size:60px;font-weight:800;letter-spacing:-0.03em;color:#0A0A0F">Todo tu negocio, <span style="background:linear-gradient(135deg,#00D4FF,#8B5CF6);-webkit-background-clip:text;background-clip:text;color:transparent">en tiempo real</span></h2>
+    </div>
+    <p style="margin:0;font-size:25px;color:#94A3B8">Ganancias · Referidos · Empresas · Capacitación</p>
+  </div>
+  <div style="display:flex;gap:60px;align-items:flex-end;margin-top:64px;justify-content:center">
+    <div style="width:1050px;border-radius:24px;border:1px solid #E2E8F0;background:#F8FAFC;box-shadow:0 30px 70px rgba(10,10,15,.12);overflow:hidden">
+      <div style="height:44px;background:#fff;border-bottom:1px solid #E2E8F0;display:flex;align-items:center;gap:8px;padding:0 20px"><span style="width:12px;height:12px;border-radius:50%;background:#FCA5A5"></span><span style="width:12px;height:12px;border-radius:50%;background:#FCD34D"></span><span style="width:12px;height:12px;border-radius:50%;background:#86EFAC"></span></div>
+      <div style="display:flex">
+        <div style="width:200px;background:#fff;border-right:1px solid #E2E8F0;padding:20px 14px;display:flex;flex-direction:column;gap:6px">
+          <div style="font-size:24px;font-weight:800;color:#0A0A0F;padding:0 8px 12px">Yaub Rewards</div>
+          <div style="background:#F8FAFC;border-radius:10px;padding:10px 12px;font-size:24px;font-weight:700;color:#0A0A0F">Inicio</div>
+          <div style="padding:10px 12px;font-size:24px;color:#94A3B8">Referidos</div>
+          <div style="padding:10px 12px;font-size:24px;color:#94A3B8">Empresas</div>
+          <div style="padding:10px 12px;font-size:24px;color:#94A3B8">Capacitación</div>
+        </div>
+        <div style="flex:1;padding:26px">
+          <div style="display:grid;grid-template-columns:1.2fr 1fr;gap:16px">
+            <div style="background:linear-gradient(135deg,#00D4FF,#8B5CF6);border-radius:16px;padding:24px;color:#fff"><div style="font-size:24px;font-weight:600;opacity:.85">GANANCIAS LIBERADAS</div><div style="font-size:52px;font-weight:800;margin-top:6px">$700</div></div>
+            <div style="background:#fff;border:1px solid #E2E8F0;border-radius:16px;padding:24px"><div style="font-size:24px;font-weight:600;color:#94A3B8">PENDIENTES</div><div style="font-size:52px;font-weight:800;color:#F59E0B;margin-top:6px">$500</div></div>
+          </div>
+          <div style="background:#fff;border:1px solid #E2E8F0;border-radius:16px;padding:22px;margin-top:16px">
+            <div style="display:flex;align-items:flex-end;gap:14px;height:120px">
+              <div style="flex:1;height:40%;border-radius:8px;background:linear-gradient(180deg,#00D4FF,#8B5CF6)"></div>
+              <div style="flex:1;height:65%;border-radius:8px;background:linear-gradient(180deg,#00D4FF,#8B5CF6)"></div>
+              <div style="flex:1;height:30%;border-radius:8px;background:linear-gradient(180deg,#00D4FF,#8B5CF6)"></div>
+              <div style="flex:1;height:80%;border-radius:8px;background:linear-gradient(180deg,#00D4FF,#8B5CF6)"></div>
+              <div style="flex:1;height:55%;border-radius:8px;background:linear-gradient(180deg,#00D4FF,#8B5CF6)"></div>
+              <div style="flex:1;height:95%;border-radius:8px;background:linear-gradient(180deg,#00D4FF,#8B5CF6)"></div>
+              <div style="flex:1;height:45%;border-radius:8px;background:linear-gradient(180deg,#00D4FF,#8B5CF6)"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div style="width:300px;border-radius:44px;border:10px solid #0A0A0F;background:#fff;box-shadow:0 30px 70px rgba(10,10,15,.18);overflow:hidden;flex-shrink:0">
+      <div style="padding:26px 20px 20px">
+        <div style="font-size:24px;font-weight:800;color:#0A0A0F">Hola, Jacobo</div>
+        <div style="margin-top:16px;background:linear-gradient(135deg,#00D4FF,#8B5CF6);border-radius:16px;padding:18px;color:#fff"><div style="font-size:24px;opacity:.9">Liberadas</div><div style="font-size:40px;font-weight:800">$700</div></div>
+        <div style="margin-top:12px;display:flex;justify-content:space-between;align-items:center;background:#F8FAFC;border-radius:12px;padding:14px 16px"><span style="font-size:24px;color:#475569">Luis H.</span><span style="font-size:24px;font-weight:700;color:#10B981">Liberado</span></div>
+        <div style="margin-top:8px;display:flex;justify-content:space-between;align-items:center;background:#F8FAFC;border-radius:12px;padding:14px 16px"><span style="font-size:24px;color:#475569">Daniela F.</span><span style="font-size:24px;font-weight:700;color:#F59E0B">Pendiente</span></div>
+        <div style="margin-top:8px;display:flex;justify-content:space-between;align-items:center;background:#F8FAFC;border-radius:12px;padding:14px 16px"><span style="font-size:24px;color:#475569">Miguel O.</span><span style="font-size:24px;font-weight:700;color:#F59E0B">Pendiente</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section data-label="Para empresas" data-speaker-notes="El otro lado del marketplace: cualquier empresa autorizada publica su oferta y activa una fuerza de ventas freelance." style="background:#F8FAFC;display:flex;flex-direction:column;justify-content:center;padding:110px 120px 90px">
+  <p style="margin:0;font-size:26px;font-weight:700;letter-spacing:.14em;color:#94A3B8">PARA EMPRESAS</p>
+  <h2 style="margin:24px 0 0;font-size:66px;font-weight:800;letter-spacing:-0.03em;color:#0A0A0F;line-height:1.15;max-width:1500px">Registra tu empresa. Publica lo que necesitas vender. <span style="background:linear-gradient(135deg,#00D4FF,#8B5CF6);-webkit-background-clip:text;background-clip:text;color:transparent">Activa una fuerza de ventas freelance.</span></h2>
+  <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:36px;margin-top:76px">
+    <div style="background:#fff;border:1px solid #E2E8F0;border-radius:20px;padding:44px;box-shadow:0 4px 24px rgba(10,10,15,.05)">
+      <p style="margin:0;font-size:28px;font-weight:800;color:#00D4FF">01</p>
+      <h3 style="margin:16px 0 0;font-size:33px;font-weight:700;color:#0A0A0F;letter-spacing:-0.01em">Regístrate</h3>
+      <p style="margin:14px 0 0;font-size:27px;color:#475569;line-height:1.5">Tu negocio queda verificado como empresa autorizada.</p>
+    </div>
+    <div style="background:#fff;border:1px solid #E2E8F0;border-radius:20px;padding:44px;box-shadow:0 4px 24px rgba(10,10,15,.05)">
+      <p style="margin:0;font-size:28px;font-weight:800;color:#0EA5E9">02</p>
+      <h3 style="margin:16px 0 0;font-size:33px;font-weight:700;color:#0A0A0F;letter-spacing:-0.01em">Publica tu oferta</h3>
+      <p style="margin:14px 0 0;font-size:27px;color:#475569;line-height:1.5">Qué necesitas vender, qué comisión ofreces y cuándo se libera.</p>
+    </div>
+    <div style="background:#fff;border:1px solid #E2E8F0;border-radius:20px;padding:44px;box-shadow:0 4px 24px rgba(10,10,15,.05)">
+      <p style="margin:0;font-size:28px;font-weight:800;color:#8B5CF6">03</p>
+      <h3 style="margin:16px 0 0;font-size:33px;font-weight:700;color:#0A0A0F;letter-spacing:-0.01em">Recibe vendedores</h3>
+      <p style="margin:14px 0 0;font-size:27px;color:#475569;line-height:1.5">Cada freelancer decide a qué empresas suscribirse.</p>
+    </div>
+  </div>
+</section>
+
+<section data-label="Capacitación" data-speaker-notes="Cada empresa capacita a su red: cursos presenciales o en línea, con certificación al completar." style="background:#FFFFFF;display:flex;flex-direction:column;justify-content:center;padding:110px 120px 90px">
+  <p style="margin:0;font-size:26px;font-weight:700;letter-spacing:.14em;color:#94A3B8">CAPACITACIÓN</p>
+  <h2 style="margin:24px 0 0;font-size:64px;font-weight:800;letter-spacing:-0.03em;color:#0A0A0F;max-width:1400px;line-height:1.15">Cada empresa capacita a sus vendedores: <span style="background:linear-gradient(135deg,#00D4FF,#8B5CF6);-webkit-background-clip:text;background-clip:text;color:transparent">presencial o en línea</span></h2>
+  <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:36px;margin-top:70px">
+    <div style="background:#fff;border:1px solid #E2E8F0;border-radius:20px;padding:40px;box-shadow:0 4px 24px rgba(10,10,15,.05)">
+      <div style="display:flex;justify-content:space-between;align-items:center"><p style="margin:0;font-size:25px;font-weight:600;color:#94A3B8">Yaub Móvil</p><span style="font-size:24px;font-weight:700;color:#0EA5E9;background:rgba(14,165,233,.1);padding:8px 20px;border-radius:999px">En línea</span></div>
+      <h3 style="margin:20px 0 0;font-size:34px;font-weight:700;color:#0A0A0F">Portabilidad 101</h3>
+      <div style="margin-top:28px;height:10px;border-radius:999px;background:#F1F5F9;overflow:hidden"><div style="width:100%;height:100%;background:linear-gradient(90deg,#00D4FF,#8B5CF6)"></div></div>
+      <p style="margin:16px 0 0;font-size:25px;font-weight:700;color:#10B981">✓ Certificado</p>
+    </div>
+    <div style="background:#fff;border:1px solid #E2E8F0;border-radius:20px;padding:40px;box-shadow:0 4px 24px rgba(10,10,15,.05)">
+      <div style="display:flex;justify-content:space-between;align-items:center"><p style="margin:0;font-size:25px;font-weight:600;color:#94A3B8">Yaub Móvil</p><span style="font-size:24px;font-weight:700;color:#0EA5E9;background:rgba(14,165,233,.1);padding:8px 20px;border-radius:999px">En línea</span></div>
+      <h3 style="margin:20px 0 0;font-size:34px;font-weight:700;color:#0A0A0F">Objeciones y cierre</h3>
+      <div style="margin-top:28px;height:10px;border-radius:999px;background:#F1F5F9;overflow:hidden"><div style="width:60%;height:100%;background:linear-gradient(90deg,#00D4FF,#8B5CF6)"></div></div>
+      <p style="margin:16px 0 0;font-size:25px;font-weight:600;color:#475569">60% completado</p>
+    </div>
+    <div style="background:#fff;border:1px solid #E2E8F0;border-radius:20px;padding:40px;box-shadow:0 4px 24px rgba(10,10,15,.05)">
+      <div style="display:flex;justify-content:space-between;align-items:center"><p style="margin:0;font-size:25px;font-weight:600;color:#94A3B8">Solar Norte</p><span style="font-size:24px;font-weight:700;color:#F59E0B;background:rgba(245,158,11,.12);padding:8px 20px;border-radius:999px">Presencial</span></div>
+      <h3 style="margin:20px 0 0;font-size:34px;font-weight:700;color:#0A0A0F">Venta solar en campo</h3>
+      <div style="margin-top:28px;height:10px;border-radius:999px;background:#F1F5F9;overflow:hidden"><div style="width:5%;height:100%;background:linear-gradient(90deg,#00D4FF,#8B5CF6)"></div></div>
+      <p style="margin:16px 0 0;font-size:25px;font-weight:600;color:#94A3B8">Por iniciar</p>
+    </div>
+  </div>
+</section>
+
+<section data-label="La tecnología" data-speaker-notes="Debajo de todo: la skill registrar_referido conectada a los agentes de Yaub. Cada captura fluye a las tablas y a los dashboards en tiempo real." style="background:#0A0A0F;display:flex;flex-direction:column;justify-content:center;padding:110px 120px 90px">
+  <p style="margin:0;font-size:26px;font-weight:700;letter-spacing:.14em;color:#475569">LA TECNOLOGÍA</p>
+  <h2 style="margin:24px 0 0;font-size:60px;font-weight:800;letter-spacing:-0.03em;color:#fff;line-height:1.2;max-width:1500px">Conectado a los agentes de Yaub con la skill <span style="font-family:ui-monospace,'SF Mono',Menlo,monospace;font-size:52px;background:linear-gradient(135deg,#00D4FF,#8B5CF6);-webkit-background-clip:text;background-clip:text;color:transparent">registrar_referido</span></h2>
+  <div style="display:flex;align-items:center;gap:0;margin-top:90px;justify-content:space-between">
+    <div style="text-align:center;width:280px">
+      <div style="width:96px;height:96px;border-radius:24px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);display:flex;align-items:center;justify-content:center;margin:0 auto"><svg width="42" height="42" viewBox="0 0 24 24" fill="none" stroke="#94A3B8" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2 M12 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8"></path></svg></div>
+      <p style="margin:20px 0 0;font-size:28px;font-weight:700;color:#fff">Cliente</p>
+      <p style="margin:6px 0 0;font-size:24px;color:#94A3B8">dice el código</p>
+    </div>
+    <div style="flex:1;height:4px;background-image:linear-gradient(90deg,#00D4FF 55%,transparent 55%);background-size:24px 4px;animation:dashMove 1s linear infinite;margin:0 6px;border-radius:2px;max-width:150px"></div>
+    <div style="text-align:center;width:300px">
+      <div style="width:96px;height:96px;border-radius:24px;background:linear-gradient(135deg,#00D4FF,#8B5CF6);display:flex;align-items:center;justify-content:center;margin:0 auto;box-shadow:0 12px 36px rgba(0,212,255,.3)"><svg width="42" height="42" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><path d="M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0z M8 12h.01 M12 12h.01 M16 12h.01"></path></svg></div>
+      <p style="margin:20px 0 0;font-size:28px;font-weight:700;color:#fff">Agente de IA</p>
+      <p style="margin:6px 0 0;font-size:24px;color:#94A3B8">WhatsApp · voz · web</p>
+    </div>
+    <div style="flex:1;height:4px;background-image:linear-gradient(90deg,#00D4FF 55%,transparent 55%);background-size:24px 4px;animation:dashMove 1s linear infinite;margin:0 6px;border-radius:2px;max-width:150px"></div>
+    <div style="text-align:center;width:320px">
+      <div style="width:96px;height:96px;border-radius:24px;background:rgba(0,212,255,.08);border:1px solid rgba(0,212,255,.35);display:flex;align-items:center;justify-content:center;margin:0 auto"><span style="font-family:ui-monospace,'SF Mono',Menlo,monospace;font-size:26px;font-weight:700;color:#00D4FF">fx</span></div>
+      <p style="margin:20px 0 0;font-size:26px;font-weight:700;color:#00D4FF;font-family:ui-monospace,'SF Mono',Menlo,monospace">registrar_referido</p>
+      <p style="margin:6px 0 0;font-size:24px;color:#94A3B8">captura y valida</p>
+    </div>
+    <div style="flex:1;height:4px;background-image:linear-gradient(90deg,#8B5CF6 55%,transparent 55%);background-size:24px 4px;animation:dashMove 1s linear infinite;margin:0 6px;border-radius:2px;max-width:150px"></div>
+    <div style="text-align:center;width:300px">
+      <div style="width:96px;height:96px;border-radius:24px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);display:flex;align-items:center;justify-content:center;margin:0 auto"><svg width="42" height="42" viewBox="0 0 24 24" fill="none" stroke="#8B5CF6" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><path d="M3 3h8v8H3z M13 3h8v8h-8z M3 13h8v8H3z M13 13h8v8h-8z"></path></svg></div>
+      <p style="margin:20px 0 0;font-size:28px;font-weight:700;color:#fff">Dashboards</p>
+      <p style="margin:6px 0 0;font-size:24px;color:#94A3B8">freelancers y empresas, en tiempo real</p>
+    </div>
+  </div>
+  <div style="margin-top:80px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);border-radius:16px;padding:26px 36px;font-family:ui-monospace,'SF Mono',Menlo,monospace;font-size:26px;color:#E2E8F0;display:flex;gap:16px;align-items:center;flex-wrap:wrap">
+    <span style="width:12px;height:12px;border-radius:50%;background:#10B981;animation:pulseDot 1.6s ease infinite;flex-shrink:0"></span>
+    <span style="color:#8B5CF6">Agente Yaub Móvil →</span>
+    <span>registrar_referido(codigo: <span style="color:#00D4FF">JACO-01</span>, cliente: +52 81 •• ••34)</span>
+    <span style="color:#10B981">✓ guardado</span>
+  </div>
+</section>
+
+<section data-label="El arranque" data-speaker-notes="Empezamos hoy con producto propio y comisión directa. Después abrimos el marketplace. La visión: la red de ventas freelance de México." style="background:#FFFFFF;display:flex;flex-direction:column;justify-content:center;padding:110px 120px 90px">
+  <p style="margin:0;font-size:26px;font-weight:700;letter-spacing:.14em;color:#94A3B8">EL ARRANQUE</p>
+  <h2 style="margin:24px 0 0;font-size:64px;font-weight:800;letter-spacing:-0.03em;color:#0A0A0F;max-width:1500px;line-height:1.15">Empezamos con nuestro propio producto: <span style="background:linear-gradient(135deg,#00D4FF,#8B5CF6);-webkit-background-clip:text;background-clip:text;color:transparent">Yaub Móvil, comisión directa, hoy</span></h2>
+  <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:36px;margin-top:80px">
+    <div style="border-top:6px solid #00D4FF;padding-top:36px">
+      <p style="margin:0;font-size:26px;font-weight:700;letter-spacing:.12em;color:#00D4FF">HOY</p>
+      <h3 style="margin:16px 0 0;font-size:38px;font-weight:700;color:#0A0A0F;letter-spacing:-0.01em">Yaub Móvil</h3>
+      <p style="margin:14px 0 0;font-size:28px;color:#475569;line-height:1.5">$100 MXN por portabilidad, con la red inicial de vendedores.</p>
+    </div>
+    <div style="border-top:6px solid #0EA5E9;padding-top:36px">
+      <p style="margin:0;font-size:26px;font-weight:700;letter-spacing:.12em;color:#0EA5E9">DESPUÉS</p>
+      <h3 style="margin:16px 0 0;font-size:38px;font-weight:700;color:#0A0A0F;letter-spacing:-0.01em">Más empresas</h3>
+      <p style="margin:14px 0 0;font-size:28px;color:#475569;line-height:1.5">Marketplace abierto: cada empresa publica su oferta y su comisión.</p>
+    </div>
+    <div style="border-top:6px solid #8B5CF6;padding-top:36px">
+      <p style="margin:0;font-size:26px;font-weight:700;letter-spacing:.12em;color:#8B5CF6">VISIÓN</p>
+      <h3 style="margin:16px 0 0;font-size:38px;font-weight:700;color:#0A0A0F;letter-spacing:-0.01em">La red de México</h3>
+      <p style="margin:14px 0 0;font-size:28px;color:#475569;line-height:1.5">La red de ventas freelance de México, impulsada por IA.</p>
+    </div>
+  </div>
+</section>
+
+<section data-label="Cierre" data-speaker-notes="Cierre y llamada a la acción: crear código de vendedor o registrar empresa." style="background:radial-gradient(1400px 700px at 50% -10%, rgba(0,212,255,.1), transparent), radial-gradient(1100px 600px at 85% 110%, rgba(139,92,246,.1), transparent), #FFFFFF;display:flex;align-items:center;justify-content:center">
+  <div style="text-align:center">
+    <h2 style="margin:0;font-size:96px;font-weight:800;letter-spacing:-0.03em;color:#0A0A0F;line-height:1.1">Tu código. Tu red. <span style="background:linear-gradient(135deg,#00D4FF,#8B5CF6);-webkit-background-clip:text;background-clip:text;color:transparent">Tus ingresos.</span></h2>
+    <div style="display:flex;gap:24px;justify-content:center;margin-top:64px">
+      <div style="background:linear-gradient(135deg,#00D4FF,#8B5CF6);color:#fff;font-size:30px;font-weight:700;padding:26px 60px;border-radius:20px;cursor:pointer;box-shadow:0 16px 44px rgba(139,92,246,.3);transition:transform .2s ease" style-hover="transform:translateY(-3px)">Crear mi código</div>
+      <div style="background:#fff;border:1px solid #E2E8F0;color:#0A0A0F;font-size:30px;font-weight:700;padding:26px 60px;border-radius:20px;cursor:pointer;transition:all .2s ease" style-hover="border-color:#8B5CF6">Registrar mi empresa</div>
+    </div>
+    <div style="display:flex;align-items:center;gap:14px;justify-content:center;margin-top:90px">
+      <img src="uploads/Yaub.icon.black.png" alt="Yaub" style="width:44px;height:auto">
+      <span style="font-size:26px;font-weight:700;color:#0A0A0F">Yaub IA</span>
+    </div>
+  </div>
+</section>
+
+</x-import>
+</x-dc>
+</body>
+</html>
