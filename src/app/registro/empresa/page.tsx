@@ -1,7 +1,7 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { supabaseBrowser } from '@/lib/supabase/client';
 import { Icon, ICON_PATHS } from '@/components/icons';
 import type { CapacitacionTipo } from '@/lib/types';
@@ -11,6 +11,31 @@ type Paso = 'datos' | 'oferta' | 'confirmar' | 'revision';
 export default function RegistroEmpresa() {
   const router = useRouter();
   const [paso, setPaso] = useState<Paso>('datos');
+  // Si ya hay sesión (ej. un freelancer que abre su "segunda oficina"),
+  // saltamos el alta de cuenta y solo pedimos los datos de la empresa.
+  const [sesionActiva, setSesionActiva] = useState<boolean>(false);
+
+  useEffect(() => {
+    const revisar = async () => {
+      const supabase = supabaseBrowser();
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+      if (!user) return;
+      const { data: empresa } = await supabase
+        .from('empresas')
+        .select('id')
+        .eq('user_id', user.id)
+        .maybeSingle();
+      if (empresa) {
+        router.replace('/empresa');
+        return;
+      }
+      setSesionActiva(true);
+    };
+    revisar();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
   const [nombre, setNombre] = useState('');
   const [giro, setGiro] = useState('');
   const [email, setEmail] = useState('');
@@ -22,17 +47,44 @@ export default function RegistroEmpresa() {
   const [cargando, setCargando] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  const registrarEmpresaConSesion = async () => {
+    const supabase = supabaseBrowser();
+    const comisionNum = parseFloat(comision.replace(/[^\d.]/g, '')) || 0;
+    const { error: rpcErr } = await supabase.rpc('registrar_empresa', {
+      p_nombre: nombre,
+      p_descripcion: giro,
+      p_producto: producto,
+      p_comision_mxn: comisionNum,
+      p_condicion: condicion,
+      p_capacitacion: capacitacion,
+    });
+    setCargando(false);
+    if (rpcErr) {
+      setError('No se pudo registrar la empresa. Intenta de nuevo.');
+      return;
+    }
+    setPaso('revision');
+  };
+
   const enviar = async () => {
     setError(null);
     setCargando(true);
+    if (sesionActiva) {
+      await registrarEmpresaConSesion();
+      return;
+    }
+    // Alta sin correo de confirmación: la edge function crea la cuenta ya
+    // confirmada (admin API) y aquí iniciamos sesión de inmediato.
     const supabase = supabaseBrowser();
-    const { data, error: err } = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        emailRedirectTo: `${window.location.origin}/rewards/auth/callback`,
-        data: {
-          full_name: nombre,
+    const res = await fetch(
+      `${process.env.NEXT_PUBLIC_SUPABASE_URL}/functions/v1/crear-cuenta-rewards`,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email,
+          password,
+          nombre,
           rol: 'empresa',
           empresa_nombre: nombre,
           empresa_descripcion: giro,
@@ -40,42 +92,27 @@ export default function RegistroEmpresa() {
           empresa_comision: comision,
           empresa_condicion: condicion,
           empresa_capacitacion: capacitacion,
-          // Evita que el trigger de la plataforma Yaub cree un tenant self-service
-          app_user_id: '00000000-0000-0000-0000-000000000000',
-          password_change_required: false,
-          is_self_signup: false,
-        },
+        }),
       },
-    });
-    if (err) {
+    ).catch(() => null);
+    const out = res ? await res.json().catch(() => null) : null;
+    if (!out?.ok) {
       setCargando(false);
       setError(
-        err.message.includes('already registered')
+        out?.error === 'ya_existe'
           ? 'Ese correo ya tiene cuenta. Inicia sesión.'
-          : err.message,
+          : out?.error ?? 'No se pudo crear tu cuenta. Intenta de nuevo.',
       );
       return;
     }
-    if (data.session) {
-      const comisionNum = parseFloat(comision.replace(/[^\d.]/g, '')) || 0;
-      const { error: rpcErr } = await supabase.rpc('registrar_empresa', {
-        p_nombre: nombre,
-        p_descripcion: giro,
-        p_producto: producto,
-        p_comision_mxn: comisionNum,
-        p_condicion: condicion,
-        p_capacitacion: capacitacion,
-      });
+
+    const { error: loginErr } = await supabase.auth.signInWithPassword({ email, password });
+    if (loginErr) {
       setCargando(false);
-      if (rpcErr) {
-        setError('No se pudo registrar la empresa. Intenta de nuevo.');
-        return;
-      }
-      setPaso('revision');
-    } else {
-      setCargando(false);
-      setPaso('confirmar');
+      setError('Tu cuenta se creó pero no pudimos iniciar sesión. Entra desde "Iniciar sesión".');
+      return;
     }
+    await registrarEmpresaConSesion();
   };
 
   const chip = (tipo: CapacitacionTipo, label: string) => (
@@ -106,15 +143,24 @@ export default function RegistroEmpresa() {
           <div className="animate-fadeUp">
             <div className="text-[13px] font-semibold text-slate3">EMPRESA · PASO 1 DE 2</div>
             <h1 className="mt-1.5 text-[26px] font-extrabold tracking-tight">Datos del negocio</h1>
+            {sesionActiva && (
+              <p className="mt-2 text-[13px] text-slate2">
+                Usarás tu misma cuenta Yaub — solo dinos de tu negocio.
+              </p>
+            )}
             <div className="mt-6 flex flex-col gap-3">
               <input className="input-yaub input-yaub--violet" placeholder="Nombre de la empresa" value={nombre} onChange={(e) => setNombre(e.target.value)} />
               <input className="input-yaub input-yaub--violet" placeholder="Giro (ej. Telefonía móvil)" value={giro} onChange={(e) => setGiro(e.target.value)} />
-              <input className="input-yaub input-yaub--violet" placeholder="Correo de contacto" type="email" value={email} onChange={(e) => setEmail(e.target.value)} autoComplete="email" />
-              <input className="input-yaub input-yaub--violet" placeholder="Contraseña (mínimo 8 caracteres)" type="password" value={password} onChange={(e) => setPassword(e.target.value)} autoComplete="new-password" />
+              {!sesionActiva && (
+                <>
+                  <input className="input-yaub input-yaub--violet" placeholder="Correo de contacto" type="email" value={email} onChange={(e) => setEmail(e.target.value)} autoComplete="email" />
+                  <input className="input-yaub input-yaub--violet" placeholder="Contraseña (mínimo 8 caracteres)" type="password" value={password} onChange={(e) => setPassword(e.target.value)} autoComplete="new-password" />
+                </>
+              )}
             </div>
             <button
               onClick={() => setPaso('oferta')}
-              disabled={!nombre.trim() || !email || password.length < 8}
+              disabled={!nombre.trim() || (!sesionActiva && (!email || password.length < 8))}
               className="mt-6 w-full rounded-2xl bg-ink py-[15px] text-base font-bold text-white transition-transform hover:-translate-y-0.5 disabled:opacity-60"
             >
               Continuar

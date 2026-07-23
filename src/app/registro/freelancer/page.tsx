@@ -21,48 +21,45 @@ export default function RegistroFreelancer() {
     setError(null);
     setCargando(true);
     const supabase = supabaseBrowser();
-    const { data, error: err } = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        emailRedirectTo: `${window.location.origin}/rewards/auth/callback`,
-        data: {
-          full_name: nombre,
-          phone: telefono,
-          rol: 'freelancer',
-          // Evita que el trigger de la plataforma Yaub cree un tenant self-service
-          app_user_id: '00000000-0000-0000-0000-000000000000',
-          password_change_required: false,
-          is_self_signup: false,
-        },
+
+    // Alta sin correo de confirmación: la edge function crea la cuenta ya
+    // confirmada (admin API) y aquí iniciamos sesión de inmediato.
+    const res = await fetch(
+      `${process.env.NEXT_PUBLIC_SUPABASE_URL}/functions/v1/crear-cuenta-rewards`,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password, nombre, telefono, rol: 'freelancer' }),
       },
-    });
-    if (err) {
+    ).catch(() => null);
+    const out = res ? await res.json().catch(() => null) : null;
+    if (!out?.ok) {
       setCargando(false);
       setError(
-        err.message.includes('already registered')
+        out?.error === 'ya_existe'
           ? 'Ese correo ya tiene cuenta. Inicia sesión.'
-          : err.message,
+          : out?.error ?? 'No se pudo crear tu cuenta. Intenta de nuevo.',
       );
       return;
     }
-    if (data.session) {
-      // Sin confirmación de correo: crea el perfil y muestra el código
-      const { data: fl, error: rpcErr } = await supabase
-        .rpc('registrar_freelancer', { p_nombre: nombre, p_telefono: telefono })
-        .single();
+
+    const { error: loginErr } = await supabase.auth.signInWithPassword({ email, password });
+    if (loginErr) {
       setCargando(false);
-      if (rpcErr || !fl) {
-        setError('No se pudo crear tu perfil. Intenta de nuevo.');
-        return;
-      }
-      setFreelancer(fl as Freelancer);
-      setPaso('codigo');
-    } else {
-      // Confirmación de correo requerida
-      setCargando(false);
-      setPaso('confirmar');
+      setError('Tu cuenta se creó pero no pudimos iniciar sesión. Entra desde "Iniciar sesión".');
+      return;
     }
+
+    const { data: fl, error: rpcErr } = await supabase
+      .rpc('registrar_freelancer', { p_nombre: nombre, p_telefono: telefono })
+      .single();
+    setCargando(false);
+    if (rpcErr || !fl) {
+      setError('No se pudo crear tu perfil. Intenta de nuevo.');
+      return;
+    }
+    setFreelancer(fl as Freelancer);
+    setPaso('codigo');
   };
 
   return (

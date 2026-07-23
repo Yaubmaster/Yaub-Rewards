@@ -1,4 +1,3 @@
-import Image from 'next/image';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import { supabaseServer } from '@/lib/supabase/server';
@@ -34,14 +33,7 @@ export default async function Bienvenida() {
       }}
     >
       <div className="w-full max-w-[420px] animate-fadeUp text-center">
-        <Image
-          src="/yaub-icon.png"
-          alt="Yaub"
-          width={84}
-          height={84}
-          className="mx-auto mb-5 h-auto w-[84px]"
-          priority
-        />
+        <img src="/rewards/yaub-icon.png" alt="Yaub" className="mx-auto mb-5 h-auto w-[84px]" />
         <h1 className="text-[34px] font-extrabold tracking-[-0.03em]">Yaub Rewards</h1>
         <p className="mt-2.5 text-base leading-relaxed text-slate2" style={{ textWrap: 'pretty' }}>
           Refiere clientes, los agentes de IA de Yaub cierran la venta, y tú cobras la comisión.
@@ -55,10 +47,13 @@ export default async function Bienvenida() {
         </Link>
         <Link
           href="/login"
-          className="mt-3.5 block text-sm text-slate3 transition-colors hover:text-slate2"
+          className="mt-3.5 block text-sm font-semibold text-slate2 transition-colors hover:text-ink"
         >
-          Ya tengo cuenta · Entrar
+          Entrar con mi cuenta Yaub →
         </Link>
+        <p className="mt-1.5 text-xs text-slate3">
+          Es la misma cuenta que usas en yaub.ai
+        </p>
       </div>
     </div>
   );

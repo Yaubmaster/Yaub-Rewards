@@ -1,6 +1,5 @@
 'use client';
 
-import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Suspense, useState } from 'react';
@@ -67,9 +66,14 @@ function LoginForm() {
 
   return (
     <div className="animate-fadeUp">
-      <Image src="/yaub-icon.png" alt="Yaub" width={56} height={56} className="mx-auto mb-[18px] block h-auto w-14" />
-      <h1 className="text-center text-[26px] font-extrabold tracking-tight">Inicia sesión</h1>
-      <p className="mt-1.5 text-center text-sm text-slate2">Bienvenido de vuelta a Yaub Rewards.</p>
+      <img src="/rewards/yaub-icon.png" alt="Yaub" className="mx-auto mb-[18px] block h-auto w-14" />
+      <h1 className="text-center text-[26px] font-extrabold tracking-tight">
+        Entra con tu cuenta Yaub
+      </h1>
+      <p className="mt-1.5 text-center text-sm text-slate2">
+        Es la misma cuenta de yaub.ai — si ya usas la plataforma, entra con ese correo y
+        contraseña.
+      </p>
 
       <div className="mt-[26px] flex flex-col gap-3">
         <input

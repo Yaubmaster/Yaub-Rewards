@@ -1,6 +1,5 @@
 'use client';
 
-import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
@@ -82,7 +81,7 @@ export function AdminClient({
       <div className="mx-auto max-w-[960px] p-4 md:px-8 md:py-8">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2.5">
-            <Image src="/yaub-icon.png" alt="Yaub" width={30} height={30} className="h-[30px] w-auto" />
+            <img src="/rewards/yaub-icon.png" alt="Yaub" className="h-[30px] w-auto" />
             <div>
               <h1 className="text-[22px] font-extrabold tracking-tight">Admin · Yaub Rewards</h1>
               <div className="text-xs text-slate3">Aprobación de empresas, referidos y pagos</div>

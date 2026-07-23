@@ -23,8 +23,18 @@ export default async function EmpresaLayout({ children }: { children: React.Reac
     .maybeSingle();
   if (!empresa) redirect('/registro/finalizar');
 
+  const { data: freelancer } = await supabase
+    .from('freelancers')
+    .select('id')
+    .eq('user_id', user.id)
+    .maybeSingle();
+
   return (
-    <Shell navItems={NAV} roleLabel={`Empresa · ${empresa.nombre}`}>
+    <Shell
+      navItems={NAV}
+      roleLabel={`Empresa · ${empresa.nombre}`}
+      switchTo={freelancer ? { href: '/app', label: 'Cambiar a Freelancer' } : undefined}
+    >
       {empresa.estado === 'en_revision' && (
         <div className="mb-4 flex items-center gap-2.5 rounded-2xl border border-[rgba(245,158,11,.4)] bg-[rgba(245,158,11,.08)] px-4 py-3 text-[13px] font-medium text-[#B45309]">
           <span className="h-2 w-2 animate-pulseDot rounded-full bg-amber1" />

@@ -145,6 +145,24 @@ export function PerfilClient({
         )}
       </div>
 
+      {/* Segunda oficina: perfil de empresa */}
+      <div className="mt-3.5 rounded-[18px] border border-dashed border-line bg-surface p-5">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <div className="text-[15px] font-bold">¿Tienes un negocio?</div>
+            <div className="mt-0.5 text-[13px] text-slate2">
+              Crea tu perfil de empresa con esta misma cuenta y arma tu red de vendedores.
+            </div>
+          </div>
+          <a
+            href="/rewards/registro/empresa"
+            className="rounded-xl bg-ink px-4 py-2.5 text-[13px] font-bold text-white transition-transform hover:-translate-y-px"
+          >
+            Crear perfil de empresa
+          </a>
+        </div>
+      </div>
+
       {/* Historial de pagos */}
       <div className="mt-3.5 rounded-[18px] border border-line bg-white p-5">
         <div className="mb-1 text-[15px] font-bold">Historial de pagos</div>
