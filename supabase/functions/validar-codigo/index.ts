@@ -35,6 +35,9 @@ async function validarApiKey(req: Request): Promise<boolean> {
   if (!provided) return false;
   const envKey = Deno.env.get("REWARDS_API_KEY");
   if (envKey && provided === envKey) return true;
+  // Llamadas internas del mismo proyecto (ej. yaub-rewards-proxy)
+  const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
+  if (serviceKey && provided === serviceKey) return true;
   const hash = await sha256Hex(provided);
   const { data } = await adminClient().from("api_keys").select("id").eq("key_hash", hash).eq("activa", true).maybeSingle();
   return !!data;
