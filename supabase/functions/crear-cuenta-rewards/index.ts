@@ -44,6 +44,21 @@ Deno.serve(async (req) => {
     return json({ ok: false, error: "Nombre requerido" }, 400);
   }
 
+  // Rate-limit anti-spam por IP (10 altas/hora): el signup es público y sin
+  // confirmación de correo. Vía RPC atómica en public (check + insert) — el schema
+  // rewards no es accesible por .from() desde aquí, solo por .rpc().
+  const ip = (req.headers.get("x-forwarded-for") ?? "").split(",")[0].trim() || "desconocida";
+  const rdb = createClient(
+    Deno.env.get("SUPABASE_URL")!,
+    Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
+  );
+  const { data: allowed, error: thrErr } = await rdb.rpc("rewards_signup_allowed", { p_ip: ip });
+  if (thrErr) {
+    console.error("throttle rpc falló:", thrErr.message);
+  } else if (allowed === false) {
+    return json({ ok: false, error: "Demasiados intentos desde tu red. Intenta más tarde." }, 429);
+  }
+
   const admin = createClient(
     Deno.env.get("SUPABASE_URL")!,
     Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
