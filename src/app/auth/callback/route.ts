@@ -36,12 +36,12 @@ export async function GET(request: Request) {
         .eq('user_id', data.user.id)
         .maybeSingle();
       if (freelancer) return NextResponse.redirect(`${base}/app`);
-      const { data: empresa } = await supabase
+      const { data: empresas } = await supabase
         .from('empresas')
         .select('id')
         .eq('user_id', data.user.id)
-        .maybeSingle();
-      if (empresa) return NextResponse.redirect(`${base}/empresa`);
+        .limit(1);
+      if (empresas && empresas.length > 0) return NextResponse.redirect(`${base}/empresa`);
       return NextResponse.redirect(`${base}/registro/finalizar`);
     }
   }

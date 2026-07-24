@@ -24,17 +24,19 @@ export default async function AppLayout({ children }: { children: React.ReactNod
     .maybeSingle();
   if (!freelancer) redirect('/registro/finalizar');
 
-  const { data: empresa } = await supabase
+  // limit(1) y no maybeSingle(): el usuario puede tener varias empresas
+  const { data: empresas } = await supabase
     .from('empresas')
     .select('id')
     .eq('user_id', user.id)
-    .maybeSingle();
+    .limit(1);
+  const tieneEmpresa = (empresas ?? []).length > 0;
 
   return (
     <Shell
       navItems={NAV}
       roleLabel={`Freelancer · ${freelancer.codigo}`}
-      switchTo={empresa ? { href: '/empresa', label: 'Cambiar a Empresa' } : undefined}
+      switchTo={tieneEmpresa ? { href: '/empresa', label: 'Cambiar a Empresa' } : undefined}
     >
       {children}
     </Shell>

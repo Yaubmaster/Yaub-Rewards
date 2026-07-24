@@ -15,12 +15,12 @@ export default async function Bienvenida() {
       .eq('user_id', user.id)
       .maybeSingle();
     if (freelancer) redirect('/app');
-    const { data: empresa } = await supabase
+    const { data: empresas } = await supabase
       .from('empresas')
       .select('id')
       .eq('user_id', user.id)
-      .maybeSingle();
-    if (empresa) redirect('/empresa');
+      .limit(1);
+    if (empresas && empresas.length > 0) redirect('/empresa');
     redirect('/registro/finalizar');
   }
 

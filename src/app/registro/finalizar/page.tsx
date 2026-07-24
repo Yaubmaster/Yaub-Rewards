@@ -35,12 +35,12 @@ export default function FinalizarRegistro() {
         setPaso('codigo');
         return;
       }
-      const { data: emp } = await supabase
+      const { data: emps } = await supabase
         .from('empresas')
         .select('id')
         .eq('user_id', user.id)
-        .maybeSingle();
-      if (emp) {
+        .limit(1);
+      if (emps && emps.length > 0) {
         router.replace('/empresa');
         return;
       }
