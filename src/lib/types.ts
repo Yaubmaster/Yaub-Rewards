@@ -26,10 +26,22 @@ export interface Oferta {
   id: string;
   empresa_id: string;
   producto: string;
+  descripcion: string | null;
+  precio_mxn: number | null;
+  fotos: string[];
   comision_mxn: number;
   condicion_liberacion: string | null;
   capacitacion: CapacitacionTipo;
   activa: boolean;
+  created_at: string;
+}
+
+export interface CapacitacionModulo {
+  id: string;
+  empresa_id: string;
+  titulo: string;
+  youtube_url: string;
+  orden: number;
   created_at: string;
 }
 

@@ -8,8 +8,14 @@ import type { CapacitacionTipo } from '@/lib/types';
 
 type Paso = 'datos' | 'oferta' | 'confirmar' | 'revision';
 
-export default function RegistroEmpresa() {
+export default function RegistroEmpresa({
+  searchParams,
+}: {
+  searchParams?: { nueva?: string };
+}) {
   const router = useRouter();
+  // ?nueva=1 → agregar una empresa adicional a la oficina (multi-empresa)
+  const esNueva = searchParams?.nueva === '1';
   const [paso, setPaso] = useState<Paso>('datos');
   // Si ya hay sesión (ej. un freelancer que abre su "segunda oficina"),
   // saltamos el alta de cuenta y solo pedimos los datos de la empresa.
@@ -22,14 +28,16 @@ export default function RegistroEmpresa() {
         data: { user },
       } = await supabase.auth.getUser();
       if (!user) return;
-      const { data: empresa } = await supabase
-        .from('empresas')
-        .select('id')
-        .eq('user_id', user.id)
-        .maybeSingle();
-      if (empresa) {
-        router.replace('/empresa');
-        return;
+      if (!esNueva) {
+        const { data: empresas } = await supabase
+          .from('empresas')
+          .select('id')
+          .eq('user_id', user.id)
+          .limit(1);
+        if (empresas && empresas.length > 0) {
+          router.replace('/empresa');
+          return;
+        }
       }
       setSesionActiva(true);
     };
@@ -59,6 +67,7 @@ export default function RegistroEmpresa() {
         p_comision_mxn: comisionNum,
         p_condicion: condicion,
         p_capacitacion: capacitacion,
+        p_adicional: esNueva,
       })
       .single();
     setCargando(false);

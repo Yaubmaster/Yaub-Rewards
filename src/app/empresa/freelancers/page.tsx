@@ -1,5 +1,6 @@
 import { redirect } from 'next/navigation';
 import { supabaseServer } from '@/lib/supabase/server';
+import { empresaActiva } from '@/lib/empresa';
 import { iniciales } from '@/lib/format';
 
 export const dynamic = 'force-dynamic';
@@ -11,11 +12,7 @@ export default async function FreelancersSuscritos() {
   } = await supabase.auth.getUser();
   if (!user) redirect('/login');
 
-  const { data: empresa } = await supabase
-    .from('empresas')
-    .select('id')
-    .eq('user_id', user.id)
-    .maybeSingle();
+  const { empresa } = await empresaActiva(supabase, user.id);
   if (!empresa) redirect('/registro/finalizar');
 
   const [{ data: suscripciones }, { data: ofertas }] = await Promise.all([
