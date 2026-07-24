@@ -5,9 +5,37 @@
 // no, el SUPABASE_SERVICE_ROLE_KEY del propio proyecto (aceptado como credencial
 // interna por las funciones de Rewards) — cero secrets manuales.
 // La acción se decide por ?action=registrar|liberar|validar (query del endpoint_path).
+//
+// AUTH DEL LLAMADOR (crítico): solo service-to-service. El único llamador legítimo es
+// el runtime de agentes (assistant-chat), que llega con el SUPABASE_SERVICE_ROLE_KEY.
+// Sin isAuthorizedServiceRole, cualquiera con la anon key pública (embebida en el
+// frontend) podría invocar el proxy — que inyecta el secreto central y opera sobre
+// Rewards (registrar/liberar comisiones) → vector de fraude. La validación interna
+// asegura el endpoint con o sin verify_jwt del gateway.
+// NOTA: este archivo es un ESPEJO del proxy en el repo yaub-platform (mismo proyecto
+// Supabase). Mantener ambos en sync; nunca desplegar una versión sin este check.
 const REWARDS_BASE = "https://xwjhuixuvmyzfhujvxhf.supabase.co/functions/v1";
 const REWARDS_API_KEY =
   Deno.env.get("REWARDS_API_KEY") ?? Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "";
+
+// Acepta el SUPABASE_SERVICE_ROLE_KEY (nuevo formato sb_secret_* que NO es JWT) o un
+// JWT legacy con role=service_role. Todo lo demás (incluida la anon key) → rechazado.
+function isAuthorizedServiceRole(authHeader: string): boolean {
+  const m = /^Bearer\s+(.+)$/.exec(authHeader);
+  if (!m) return false;
+  const token = m[1].trim();
+  const envSecret = (Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") || "").trim();
+  if (envSecret && token === envSecret) return true;
+  const parts = token.split(".");
+  if (parts.length !== 3) return false;
+  try {
+    const padded = parts[1].replace(/-/g, "+").replace(/_/g, "/");
+    const txt = atob(padded + "===".slice(0, (4 - padded.length % 4) % 4));
+    return JSON.parse(txt)?.role === "service_role";
+  } catch {
+    return false;
+  }
+}
 
 const CORS = {
   "Access-Control-Allow-Origin": "*",
@@ -19,6 +47,10 @@ const json = (b: unknown, status = 200) =>
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: CORS });
+  // Auth PRIMERO: solo service-role. Rechaza a cualquiera antes de tocar el secreto.
+  if (!isAuthorizedServiceRole(req.headers.get("Authorization") ?? "")) {
+    return json({ error: "forbidden" }, 403);
+  }
   if (!REWARDS_API_KEY) return json({ error: "REWARDS_API_KEY no configurada en el proyecto" }, 500);
 
   try {
