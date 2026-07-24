@@ -1,5 +1,5 @@
 // POST /functions/v1/liberar-referido
-// Auth: header `x-rewards-key` (o ?key= para pruebas) contra REWARDS_API_KEY
+// Auth: header `x-rewards-key` contra REWARDS_API_KEY (o service-role interno).
 // Body: { cliente_telefono, evento } (ej. evento: 'primera_recarga')
 // Pasa el referido pendiente de ese teléfono a `liberado` (idempotente).
 import { createClient } from "npm:@supabase/supabase-js@2";
@@ -31,8 +31,7 @@ function adminClient() {
 }
 
 async function validarApiKey(req: Request): Promise<boolean> {
-  const url = new URL(req.url);
-  const provided = req.headers.get("x-rewards-key") ?? url.searchParams.get("key") ?? "";
+  const provided = req.headers.get("x-rewards-key") ?? "";
   if (!provided) return false;
   const envKey = Deno.env.get("REWARDS_API_KEY");
   if (envKey && provided === envKey) return true;
