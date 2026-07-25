@@ -8,6 +8,7 @@ import Link from 'next/link';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { supabaseBrowser } from '@/lib/supabase/client';
 import { Icon, ICON_PATHS } from '@/components/icons';
+import { PromptAgente } from '@/components/PromptAgente';
 import {
   agentesApi,
   estadoAgente,
@@ -421,7 +422,8 @@ Se acabaron tus {agente.interacciones_incluidas} interacciones gratis.
 
       <div className="mt-5 grid gap-4 lg:grid-cols-[1fr_380px]">
         {/* Chat de prueba */}
-        <div className="min-w-0">
+        <div className="flex min-w-0 flex-col gap-4">
+          <PromptAgente assistantId={assistantId} />
           {agente.widget_key ? (
             <ChatPrueba widgetKey={agente.widget_key} pausado={pausado} />
           ) : (
