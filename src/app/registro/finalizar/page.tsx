@@ -6,6 +6,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { supabaseBrowser } from '@/lib/supabase/client';
 import { PasoCodigo, PasoEmpresas } from '@/components/onboarding/PasosFreelancer';
+import { crearAgenteDeEmpresa } from '@/lib/crearAgenteEmpresa';
 import type { Freelancer } from '@/lib/types';
 
 export default function FinalizarRegistro() {
@@ -48,7 +49,7 @@ export default function FinalizarRegistro() {
       const meta = (user.user_metadata ?? {}) as Record<string, string>;
       if (meta.rol === 'empresa') {
         const comisionNum = parseFloat((meta.empresa_comision ?? '').replace(/[^\d.]/g, '')) || 0;
-        const { error } = await supabase.rpc('registrar_empresa', {
+        const { data: nueva, error } = await supabase.rpc('registrar_empresa', {
           p_nombre: meta.empresa_nombre || meta.full_name || 'Mi empresa',
           p_descripcion: meta.empresa_descripcion ?? null,
           p_producto: meta.empresa_producto ?? null,
@@ -60,17 +61,38 @@ export default function FinalizarRegistro() {
           setPaso('error');
           return;
         }
+        // Cada empresa es un agente: se le crea al terminar el alta
+        const emp = nueva as { id?: string } | null;
+        if (emp?.id) {
+          await crearAgenteDeEmpresa({
+            empresaId: emp.id,
+            nombre: meta.empresa_nombre || meta.full_name || 'Mi empresa',
+            giro: meta.empresa_descripcion ?? null,
+            producto: meta.empresa_producto ?? null,
+          });
+        }
         router.replace('/empresa');
         return;
       }
 
-      // Freelancer (default)
-      const { data: nuevo, error } = await supabase
+      // Freelancer (default). El código de referido viene de la metadata del
+      // signup; si por alguna razón ya no es válido, reintenta sin código para
+      // no bloquear el registro.
+      let { data: nuevo, error } = await supabase
         .rpc('registrar_freelancer', {
           p_nombre: meta.full_name || user.email?.split('@')[0] || 'Vendedor',
           p_telefono: meta.phone ?? null,
+          p_codigo_referido: meta.codigo_referido ?? null,
         })
         .single();
+      if (error?.message?.includes('codigo_invalido')) {
+        ({ data: nuevo, error } = await supabase
+          .rpc('registrar_freelancer', {
+            p_nombre: meta.full_name || user.email?.split('@')[0] || 'Vendedor',
+            p_telefono: meta.phone ?? null,
+          })
+          .single());
+      }
       if (error || !nuevo) {
         setPaso('error');
         return;
@@ -87,7 +109,7 @@ export default function FinalizarRegistro() {
       className="flex min-h-screen items-center justify-center p-6"
       style={{
         background:
-          'radial-gradient(1200px 600px at 50% -10%, rgba(0,212,255,.08), transparent), radial-gradient(900px 500px at 80% 110%, rgba(139,92,246,.07), transparent), #FFFFFF',
+          'radial-gradient(1200px 600px at 50% -10%, rgba(0,212,255,.08), transparent), radial-gradient(900px 500px at 80% 110%, rgba(139,92,246,.07), transparent), rgb(var(--fondo))',
       }}
     >
       <div className="w-full max-w-[420px]">

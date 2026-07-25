@@ -9,6 +9,7 @@ export interface Freelancer {
   telefono: string | null;
   codigo: string;
   clabe: string | null;
+  avatar_url: string | null;
   activo: boolean;
   created_at: string;
 }

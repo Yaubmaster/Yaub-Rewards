@@ -81,7 +81,7 @@ export function AdminClient({
       <div className="mx-auto max-w-[960px] p-4 md:px-8 md:py-8">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2.5">
-            <img src="/rewards/yaub-icon.png" alt="Yaub" className="h-[30px] w-auto" />
+            <img src="/rewards/yaub-icon.png" alt="Yaub" className="logo-yaub h-[30px] w-auto" />
             <div>
               <h1 className="text-[22px] font-extrabold tracking-tight">Admin · Yaub Rewards</h1>
               <div className="text-xs text-slate3">Aprobación de empresas, referidos y pagos</div>
@@ -100,8 +100,8 @@ export function AdminClient({
               className="rounded-full border px-[15px] py-2 text-[13px] font-semibold transition-all"
               style={
                 tab === t.k
-                  ? { background: '#0A0A0F', color: '#fff', borderColor: '#0A0A0F' }
-                  : { background: '#fff', color: '#475569', borderColor: '#E2E8F0' }
+                  ? { background: 'rgb(var(--tinta))', color: 'rgb(var(--card))', borderColor: 'rgb(var(--tinta))' }
+                  : { background: 'rgb(var(--card))', color: 'rgb(var(--tinta2))', borderColor: 'rgb(var(--linea))' }
               }
             >
               {t.label}
@@ -122,7 +122,7 @@ export function AdminClient({
                   className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[11px] text-[15px] font-extrabold"
                   style={
                     e.estado === 'autorizada'
-                      ? { background: '#0A0A0F', color: '#fff' }
+                      ? { background: 'rgb(var(--tinta))', color: 'rgb(var(--card))' }
                       : { background: 'rgba(245,158,11,.14)', color: '#F59E0B' }
                   }
                 >

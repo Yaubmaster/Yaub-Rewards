@@ -122,7 +122,11 @@ export function CapacitacionClient({
                             style={
                               visto
                                 ? { background: 'rgba(16,185,129,.1)', color: '#10B981' }
-                                : { background: '#fff', color: '#94A3B8', border: '1px solid #E2E8F0' }
+                                : {
+                                    background: 'rgb(var(--card))',
+                                    color: 'rgb(var(--tinta3))',
+                                    border: '1px solid rgb(var(--linea))',
+                                  }
                             }
                           >
                             {visto ? '✓ Visto' : 'Marcar visto'}

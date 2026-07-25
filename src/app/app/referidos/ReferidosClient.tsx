@@ -43,8 +43,8 @@ export function ReferidosClient({
               className="rounded-full border px-[15px] py-2 text-[13px] font-semibold transition-all"
               style={
                 on
-                  ? { background: '#0A0A0F', color: '#fff', borderColor: '#0A0A0F' }
-                  : { background: '#fff', color: '#475569', borderColor: '#E2E8F0' }
+                  ? { background: 'rgb(var(--tinta))', color: 'rgb(var(--card))', borderColor: 'rgb(var(--tinta))' }
+                  : { background: 'rgb(var(--card))', color: 'rgb(var(--tinta2))', borderColor: 'rgb(var(--linea))' }
               }
             >
               {f.label}

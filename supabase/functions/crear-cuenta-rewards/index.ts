@@ -4,6 +4,14 @@
 // inicia sesión inmediatamente con email+password.
 // Equivale al signup público (mismos datos, misma exposición), pero evita
 // depender del SMTP del proyecto y no toca la config global de Auth.
+//
+// SSO con la plataforma (Feature 1):
+// · rol=empresa → is_self_signup: el trigger de plataforma crea su tenant
+//   self_service real (+ plan + permisos), igual que un alta en yaub.ai.
+//   rewards.ensure_empresa_tenant lo liga a la empresa en el primer uso.
+// · rol=freelancer → sin tenant (marcador app_user_id), solo app_users.
+// · codigo_referido (opcional, freelancer): se valida aquí ANTES de crear la
+//   cuenta y viaja en user_metadata para que registrar_freelancer lo aplique.
 import { createClient } from "npm:@supabase/supabase-js@2";
 
 const CORS = {
@@ -33,6 +41,7 @@ Deno.serve(async (req) => {
   const password = body.password ?? "";
   const nombre = (body.nombre ?? "").trim();
   const rol = body.rol === "empresa" ? "empresa" : "freelancer";
+  const codigoReferido = (body.codigo_referido ?? "").trim();
 
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)) {
     return json({ ok: false, error: "Correo inválido" }, 400);
@@ -59,10 +68,25 @@ Deno.serve(async (req) => {
     return json({ ok: false, error: "Demasiados intentos desde tu red. Intenta más tarde." }, 429);
   }
 
+  // Código de referido (solo freelancers): validar antes de crear la cuenta
+  // para que el form pueda corregirlo sin dejar cuentas a medias.
+  if (rol === "freelancer" && codigoReferido) {
+    const { data: val, error: valErr } = await rdb
+      .schema("rewards")
+      .rpc("validar_codigo_vendedor", { p_codigo: codigoReferido });
+    if (valErr) {
+      console.error("validar_codigo_vendedor falló:", valErr.message);
+    } else if (!(val as { valido?: boolean } | null)?.valido) {
+      return json({ ok: false, error: "codigo_invalido" }, 400);
+    }
+  }
+
   const admin = createClient(
     Deno.env.get("SUPABASE_URL")!,
     Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
   );
+
+  const esEmpresa = rol === "empresa";
 
   const { error } = await admin.auth.admin.createUser({
     email,
@@ -79,10 +103,23 @@ Deno.serve(async (req) => {
       empresa_comision: body.empresa_comision ?? null,
       empresa_condicion: body.empresa_condicion ?? null,
       empresa_capacitacion: body.empresa_capacitacion ?? null,
-      // Evita que el trigger de la plataforma Yaub cree un tenant self-service
-      app_user_id: "00000000-0000-0000-0000-000000000000",
+      // Código de vendedor que lo refirió (lo aplica registrar_freelancer)
+      codigo_referido: rol === "freelancer" && codigoReferido ? codigoReferido : null,
+      ...(esEmpresa
+        ? {
+            // Empresa = cuenta Yaub completa: el trigger de la plataforma crea
+            // su tenant self_service (mismo camino que un alta en yaub.ai).
+            is_self_signup: true,
+            company_name: (body.empresa_nombre ?? "").trim() || nombre,
+            source: "rewards",
+          }
+        : {
+            // Freelancer: evita que el trigger de la plataforma cree un tenant
+            // self-service; su app_user queda sin tenant (identidad única igual).
+            app_user_id: "00000000-0000-0000-0000-000000000000",
+            is_self_signup: false,
+          }),
       password_change_required: false,
-      is_self_signup: false,
     },
   });
 

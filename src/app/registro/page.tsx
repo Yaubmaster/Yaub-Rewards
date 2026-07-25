@@ -7,7 +7,7 @@ export default function ElegirRol() {
       className="flex min-h-screen items-center justify-center p-6"
       style={{
         background:
-          'radial-gradient(1200px 600px at 50% -10%, rgba(0,212,255,.08), transparent), radial-gradient(900px 500px at 80% 110%, rgba(139,92,246,.07), transparent), #FFFFFF',
+          'radial-gradient(1200px 600px at 50% -10%, rgba(0,212,255,.08), transparent), radial-gradient(900px 500px at 80% 110%, rgba(139,92,246,.07), transparent), rgb(var(--fondo))',
       }}
     >
       <div className="w-full max-w-[420px] animate-fadeUp">
@@ -43,11 +43,23 @@ export default function ElegirRol() {
           </div>
         </Link>
 
-        <p className="mt-6 text-center text-sm text-slate3">
-          ¿Ya tienes cuenta?{' '}
-          <Link href="/login" className="font-semibold text-[#0EA5E9] hover:text-violet1">
-            Entrar
-          </Link>
+        <div className="mt-6 flex items-center gap-3">
+          <div className="h-px flex-1 bg-line" />
+          <span className="text-xs text-slate3">¿ya tienes cuenta?</span>
+          <div className="h-px flex-1 bg-line" />
+        </div>
+
+        {/* Una sola identidad Yaub: la cuenta de yaub.ai/platform sirve aquí y viceversa */}
+        <Link
+          href="/login"
+          className="mt-4 flex w-full items-center justify-center gap-2.5 rounded-[14px] border border-line bg-white py-[13px] text-sm font-bold text-ink transition-all hover:-translate-y-0.5 hover:border-cyan1"
+          style={{ boxShadow: '0 2px 8px rgba(10,10,15,.04)' }}
+        >
+          <img src="/rewards/yaub-icon.png" alt="" className="logo-yaub h-5 w-auto" />
+          Entrar con Yaub
+        </Link>
+        <p className="mt-2.5 text-center text-xs text-slate3">
+          Una sola cuenta para yaub.ai, la plataforma y Rewards.
         </p>
       </div>
     </div>

@@ -5,11 +5,16 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        ink: '#0A0A0F',
-        slate2: '#475569',
-        slate3: '#94A3B8',
-        surface: '#F8FAFC',
-        line: '#E2E8F0',
+        // Neutros temables (ver :root / :root[data-tema='dark'] en globals.css)
+        ink: 'rgb(var(--tinta) / <alpha-value>)',
+        slate2: 'rgb(var(--tinta2) / <alpha-value>)',
+        slate3: 'rgb(var(--tinta3) / <alpha-value>)',
+        surface: 'rgb(var(--superficie) / <alpha-value>)',
+        line: 'rgb(var(--linea) / <alpha-value>)',
+        // Superficie de tarjeta. `bg-white` ya se remapea en oscuro (ver
+        // globals.css); esto es para lo que se escribe temable desde el inicio.
+        card: 'rgb(var(--card) / <alpha-value>)',
+        // Acentos de marca: iguales en claro y oscuro
         cyan1: '#00D4FF',
         violet1: '#8B5CF6',
         green1: '#10B981',

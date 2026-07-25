@@ -66,7 +66,7 @@ function LoginForm() {
 
   return (
     <div className="animate-fadeUp">
-      <img src="/rewards/yaub-icon.png" alt="Yaub" className="mx-auto mb-[18px] block h-auto w-14" />
+      <img src="/rewards/yaub-icon.png" alt="Yaub" className="logo-yaub mx-auto mb-[18px] block h-auto w-14" />
       <h1 className="text-center text-[26px] font-extrabold tracking-tight">
         Entra con tu cuenta Yaub
       </h1>
@@ -102,9 +102,18 @@ function LoginForm() {
       <button
         onClick={entrar}
         disabled={cargando || !email || (modo === 'password' && !password)}
-        className="btn-gradient mt-[18px] w-full py-[15px] text-base disabled:opacity-60"
+        className="btn-gradient mt-[18px] flex w-full items-center justify-center gap-2.5 py-[15px] text-base disabled:opacity-60"
       >
-        {cargando ? 'Un momento…' : modo === 'password' ? 'Entrar' : 'Enviarme enlace mágico'}
+        {cargando ? (
+          'Un momento…'
+        ) : modo === 'password' ? (
+          <>
+            <img src="/rewards/yaub-icon.png" alt="" className="h-5 w-auto brightness-0 invert" />
+            Entrar con Yaub
+          </>
+        ) : (
+          'Enviarme enlace mágico'
+        )}
       </button>
 
       <div className="mt-5 flex items-center gap-3">
@@ -139,7 +148,7 @@ export default function Login() {
       className="flex min-h-screen items-center justify-center p-6"
       style={{
         background:
-          'radial-gradient(1200px 600px at 50% -10%, rgba(0,212,255,.08), transparent), radial-gradient(900px 500px at 80% 110%, rgba(139,92,246,.07), transparent), #FFFFFF',
+          'radial-gradient(1200px 600px at 50% -10%, rgba(0,212,255,.08), transparent), radial-gradient(900px 500px at 80% 110%, rgba(139,92,246,.07), transparent), rgb(var(--fondo))',
       }}
     >
       <div className="w-full max-w-[420px]">

@@ -34,10 +34,10 @@ export function EmpresaSelector({ empresas, activaId }: { empresas: Empresa[]; a
         </select>
       )}
       <Link
-        href="/registro/empresa?nueva=1"
+        href="/empresa/agentes/nuevo"
         className="rounded-xl border border-dashed border-[#CBD5E1] bg-surface px-3 py-2 text-[13px] font-semibold text-slate2 transition-colors hover:border-cyan1 hover:text-[#0EA5E9]"
       >
-        + Agregar empresa
+        + Crear empresa/agente
       </Link>
     </div>
   );
