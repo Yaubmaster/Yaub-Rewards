@@ -11,6 +11,9 @@ const config: Config = {
         slate3: 'rgb(var(--tinta3) / <alpha-value>)',
         surface: 'rgb(var(--superficie) / <alpha-value>)',
         line: 'rgb(var(--linea) / <alpha-value>)',
+        // Superficie de tarjeta. `bg-white` ya se remapea en oscuro (ver
+        // globals.css); esto es para lo que se escribe temable desde el inicio.
+        card: 'rgb(var(--card) / <alpha-value>)',
         // Acentos de marca: iguales en claro y oscuro
         cyan1: '#00D4FF',
         violet1: '#8B5CF6',

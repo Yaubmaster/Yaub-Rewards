@@ -7,11 +7,13 @@
 import Link from 'next/link';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { supabaseBrowser } from '@/lib/supabase/client';
+import { Avatar, AvatarEditable } from '@/components/Avatar';
 import { Icon, ICON_PATHS } from '@/components/icons';
 import { PromptAgente } from '@/components/PromptAgente';
 import {
   agentesApi,
   estadoAgente,
+  guardarAvatarAgente,
   interaccionesRestantes,
   misEmpresasAgentes,
   type ContextoConocimiento,
@@ -365,9 +367,7 @@ export function AgenteDetalleClient({ assistantId }: { assistantId: string }) {
 
       <div className="mt-2 flex flex-wrap items-center justify-between gap-3">
         <div className="flex items-center gap-3">
-          <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-badge">
-            <Icon d={ICON_PATHS.bot} size={22} stroke="#fff" strokeWidth={2} />
-          </div>
+          <Avatar url={agente.avatar_url} nombre={agente.nombre} size={44} icono="bot" />
           <div>
             <h1 className="text-[22px] font-extrabold tracking-tight">{agente.nombre}</h1>
             <div className="text-xs text-slate3">{item.empresa} · chat web</div>
@@ -435,6 +435,24 @@ Se acabaron tus {agente.interacciones_incluidas} interacciones gratis.
 
         {/* Contexto opcional */}
         <div className="flex min-w-0 flex-col gap-3">
+          <div className="card p-4">
+            <div className="text-sm font-bold">Foto de tu empresa</div>
+            <div className="mb-3 text-xs text-slate3">
+              Es la cara del agente en el marketplace de vendedores.
+            </div>
+            <AvatarEditable
+              url={agente.avatar_url}
+              nombre={item.empresa}
+              size={64}
+              icono="bot"
+              slug={`agente-${agente.id}`}
+              onGuardar={async (url) => {
+                await guardarAvatarAgente(agente.id, url);
+                await cargar();
+              }}
+            />
+          </div>
+
           <div className="text-[13px] font-bold text-slate2">
             Dale contexto a tu agente <span className="font-medium text-slate3">(opcional)</span>
           </div>

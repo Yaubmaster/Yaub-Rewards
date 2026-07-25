@@ -6,6 +6,7 @@
 import Link from 'next/link';
 import { useCallback, useEffect, useState } from 'react';
 import { supabaseBrowser } from '@/lib/supabase/client';
+import { Avatar } from '@/components/Avatar';
 import { Icon, ICON_PATHS } from '@/components/icons';
 import { INTERACCIONES_TRIAL, PLAN_MENSUAL, type AgenteDeCuenta } from '@/lib/agentesApi';
 
@@ -135,9 +136,7 @@ export function AgentesClient() {
                 href={`/empresa/agentes/${a.assistant_id}`}
                 className="card flex items-center gap-4 p-4 transition-all hover:-translate-y-0.5 hover:border-cyan1 md:p-5"
               >
-                <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-badge">
-                  <Icon d={ICON_PATHS.bot} size={22} stroke="#fff" strokeWidth={2} />
-                </div>
+                <Avatar url={a.avatar_url} nombre={a.nombre} size={44} icono="bot" />
                 <div className="min-w-0 flex-1">
                   <div className="truncate text-[15px] font-bold">{a.nombre}</div>
                   <div className="mt-0.5 text-xs text-slate3">
@@ -162,9 +161,7 @@ export function AgentesClient() {
           <div className="mt-2 flex flex-col gap-2.5">
             {disponibles.map((a) => (
               <div key={a.assistant_id} className="card flex items-center gap-3 p-3.5 md:p-4">
-                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-line bg-surface">
-                  <Icon d={ICON_PATHS.bot} size={18} stroke="rgb(var(--tinta3))" />
-                </div>
+                <Avatar url={a.avatar_url} nombre={a.nombre} size={38} icono="bot" className="opacity-90" />
                 <div className="min-w-0 flex-1">
                   <div className="truncate text-[14px] font-bold">{a.nombre}</div>
                   <div className="text-xs text-slate3">{a.tenant}</div>

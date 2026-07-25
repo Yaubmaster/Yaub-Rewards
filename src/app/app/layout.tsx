@@ -6,7 +6,8 @@ const NAV: NavItem[] = [
   { href: '/app', label: 'Inicio', icon: 'home' },
   { href: '/app/referidos', label: 'Referidos', icon: 'users' },
   { href: '/app/empresas', label: 'Empresas', icon: 'store' },
-  { href: '/app/capacitacion', label: 'Capacitación', icon: 'cap' },
+  { href: '/app/mis-ofertas', label: 'Mis ofertas', icon: 'heart', corta: 'Ofertas' },
+  { href: '/app/capacitacion', label: 'Capacitación', icon: 'cap', corta: 'Cursos' },
   { href: '/app/perfil', label: 'Perfil', icon: 'user' },
 ];
 

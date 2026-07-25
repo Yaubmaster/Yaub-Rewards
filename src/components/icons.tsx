@@ -30,7 +30,12 @@ export const ICON_PATHS = {
   plus: 'M12 5v14 M5 12h14',
   sun: 'M12 17a5 5 0 1 0 0-10 5 5 0 0 0 0 10z M12 1.5v2 M12 20.5v2 M4.2 4.2l1.4 1.4 M18.4 18.4l1.4 1.4 M1.5 12h2 M20.5 12h2 M4.2 19.8l1.4-1.4 M18.4 5.6l1.4-1.4',
   moon: 'M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z',
+  heart:
+    'M12 20.3 3.6 11.9a4.9 4.9 0 0 1 0-7 4.9 4.9 0 0 1 7 0l1.4 1.4 1.4-1.4a4.9 4.9 0 0 1 7 0 4.9 4.9 0 0 1 0 7z',
+  close: 'M6 6l12 12 M18 6 6 18',
 } as const;
+
+export type IconName = keyof typeof ICON_PATHS;
 
 export function Icon({
   d,

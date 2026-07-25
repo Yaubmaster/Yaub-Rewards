@@ -10,6 +10,7 @@ const NAV: NavItem[] = [
   { href: '/empresa/oferta', label: 'Mi oferta', icon: 'tag' },
   { href: '/empresa/freelancers', label: 'Freelancers', icon: 'users' },
   { href: '/empresa/referidos', label: 'Referidos', icon: 'list' },
+  { href: '/empresa/cuenta', label: 'Cuenta', icon: 'user' },
 ];
 
 export default async function EmpresaLayout({ children }: { children: React.ReactNode }) {

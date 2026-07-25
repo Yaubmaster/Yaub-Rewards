@@ -16,6 +16,8 @@ export interface AgenteDeCuenta {
   nombre: string;
   tenant_id: string;
   tenant: string;
+  avatar_url: string | null;
+  tenant_avatar: string | null;
   activo: boolean;
   widget_key: string | null;
   /** Tiene cableada la skill de Rewards (registrar_referido / validar_codigo) */
@@ -30,6 +32,7 @@ export interface AgenteDeCuenta {
 export interface AgenteDeEmpresa {
   id: string;
   nombre: string;
+  avatar_url: string | null;
   activo: boolean;
   widget_key: string | null;
   interacciones_incluidas: number;
@@ -72,6 +75,52 @@ export async function misEmpresasAgentes(): Promise<EmpresaConAgente[]> {
   const { data, error } = await supabase.rpc('mis_empresas_agentes');
   if (error) throw new Error('No pudimos cargar tus agentes. Intenta de nuevo.');
   return (data ?? []) as unknown as EmpresaConAgente[];
+}
+
+/**
+ * Guarda la foto del agente. Va por RPC SECURITY INVOKER: la RLS de la
+ * plataforma decide si esta cuenta puede editar ese agente.
+ */
+export async function guardarAvatarAgente(assistantId: string, url: string | null): Promise<void> {
+  const { error } = await supabaseBrowser().rpc('guardar_avatar_agente', {
+    p_assistant_id: assistantId,
+    p_url: url ?? '',
+  });
+  if (error) {
+    throw new Error(
+      error.message?.includes('permiso')
+        ? 'Solo el dueño de la cuenta Yaub puede cambiar la foto de este agente.'
+        : 'No se pudo guardar la foto.',
+    );
+  }
+}
+
+/** Cuentas (tenants) de Yaub que el usuario puede administrar desde Rewards. */
+export interface CuentaYaub {
+  tenant_id: string;
+  nombre: string;
+  avatar_url: string | null;
+  agentes: number;
+}
+
+export async function misCuentas(): Promise<CuentaYaub[]> {
+  const { data, error } = await supabaseBrowser().rpc('mis_tenants');
+  if (error) throw new Error('No pudimos cargar tus cuentas de Yaub.');
+  return (data ?? []) as unknown as CuentaYaub[];
+}
+
+export async function guardarAvatarCuenta(tenantId: string, url: string | null): Promise<void> {
+  const { error } = await supabaseBrowser().rpc('guardar_avatar_tenant', {
+    p_tenant_id: tenantId,
+    p_url: url ?? '',
+  });
+  if (error) {
+    throw new Error(
+      error.message?.includes('permiso')
+        ? 'Solo el dueño de esta cuenta de Yaub puede cambiarle el logo.'
+        : 'No se pudo guardar el logo.',
+    );
+  }
 }
 
 export async function agentesApi<T = Record<string, unknown>>(

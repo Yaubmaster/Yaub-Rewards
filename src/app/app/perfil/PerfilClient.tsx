@@ -2,10 +2,11 @@
 
 import { useState } from 'react';
 import { supabaseBrowser } from '@/lib/supabase/client';
+import { Avatar, AvatarEditable } from '@/components/Avatar';
 import { useCopiar } from '@/components/CodigoBadge';
 import { Icon, ICON_PATHS } from '@/components/icons';
 import { TemaToggle } from '@/components/TemaToggle';
-import { fechaLarga, iniciales, mxn } from '@/lib/format';
+import { fechaLarga, mxn } from '@/lib/format';
 import type { Freelancer, Pago } from '@/lib/types';
 
 export function PerfilClient({
@@ -23,6 +24,16 @@ export function PerfilClient({
   const [clabeGuardada, setClabeGuardada] = useState(freelancer.clabe ?? '');
   const [guardando, setGuardando] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [avatar, setAvatar] = useState<string | null>(freelancer.avatar_url ?? null);
+
+  const guardarAvatar = async (url: string | null) => {
+    const { error: err } = await supabaseBrowser()
+      .from('freelancers')
+      .update({ avatar_url: url })
+      .eq('id', freelancer.id);
+    if (err) throw new Error('No se pudo guardar tu foto.');
+    setAvatar(url);
+  };
 
   const guardarClabe = async () => {
     const limpia = clabe.replace(/\s/g, '');
@@ -52,9 +63,7 @@ export function PerfilClient({
   return (
     <div className="animate-fadeUpFast">
       <div className="flex items-center gap-4">
-        <div className="flex h-16 w-16 items-center justify-center rounded-full bg-badge text-[22px] font-extrabold text-white">
-          {iniciales(freelancer.nombre)}
-        </div>
+        <Avatar url={avatar} nombre={freelancer.nombre} size={64} forma="circulo" />
         <div>
           <h1 className="text-[22px] font-extrabold tracking-tight">{freelancer.nombre}</h1>
           <div className="text-[13px] text-slate2">
@@ -144,6 +153,22 @@ export function PerfilClient({
             Agrega tu CLABE para recibir tus depósitos de comisiones.
           </div>
         )}
+      </div>
+
+      {/* Foto de perfil */}
+      <div className="mt-3.5 rounded-[18px] border border-line bg-white p-5">
+        <div className="mb-1 text-[15px] font-bold">Tu foto</div>
+        <div className="mb-3.5 text-[13px] text-slate2">
+          Sale en tu perfil y donde las empresas ven a sus vendedores.
+        </div>
+        <AvatarEditable
+          url={avatar}
+          nombre={freelancer.nombre}
+          size={68}
+          forma="circulo"
+          slug="freelancer"
+          onGuardar={guardarAvatar}
+        />
       </div>
 
       {/* Apariencia */}

@@ -1,7 +1,7 @@
 import { redirect } from 'next/navigation';
 import { supabaseServer } from '@/lib/supabase/server';
 import { empresaActiva } from '@/lib/empresa';
-import { iniciales } from '@/lib/format';
+import { Avatar } from '@/components/Avatar';
 
 export const dynamic = 'force-dynamic';
 
@@ -18,7 +18,7 @@ export default async function FreelancersSuscritos() {
   const [{ data: suscripciones }, { data: ofertas }] = await Promise.all([
     supabase
       .from('suscripciones')
-      .select('capacitacion_completada, freelancers(id, nombre, codigo)')
+      .select('capacitacion_completada, freelancers(id, nombre, codigo, avatar_url)')
       .eq('empresa_id', empresa.id),
     supabase.from('ofertas').select('id, capacitacion').eq('empresa_id', empresa.id),
   ]);
@@ -40,6 +40,7 @@ export default async function FreelancersSuscritos() {
       id: s.freelancers?.id as string,
       nombre: (s.freelancers?.nombre as string) ?? '—',
       codigo: (s.freelancers?.codigo as string) ?? '—',
+      avatar: (s.freelancers?.avatar_url as string | null) ?? null,
       refs: conteo.get(s.freelancers?.id) ?? 0,
       cap: !requiereCap ? null : s.capacitacion_completada ? 'Certificado' : 'En curso',
     }))
@@ -60,9 +61,7 @@ export default async function FreelancersSuscritos() {
             key={f.id}
             className="flex items-center gap-3.5 rounded-2xl border border-line bg-white px-4 py-[15px] transition-shadow hover:shadow-[0_6px_18px_rgba(10,10,15,.06)]"
           >
-            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-badge text-sm font-bold text-white">
-              {iniciales(f.nombre)}
-            </div>
+            <Avatar url={f.avatar} nombre={f.nombre} size={40} forma="circulo" />
             <div className="min-w-0 flex-1">
               <div className="text-sm font-semibold">{f.nombre}</div>
               <div className="mt-px font-mono text-xs text-slate3">{f.codigo}</div>

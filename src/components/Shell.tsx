@@ -10,6 +10,8 @@ export interface NavItem {
   href: string;
   label: string;
   icon: keyof typeof ICON_PATHS;
+  /** Etiqueta para la barra inferior de móvil, donde cada tab mide ~55px */
+  corta?: string;
 }
 
 export function Shell({
@@ -128,7 +130,7 @@ export function Shell({
                 <Link
                   key={it.href}
                   href={it.href}
-                  className="flex min-h-[44px] flex-1 flex-col items-center justify-center gap-[3px] rounded-xl py-1.5 active:scale-95"
+                  className="flex min-h-[44px] min-w-0 flex-1 flex-col items-center justify-center gap-[3px] rounded-xl px-0.5 py-1.5 active:scale-95"
                 >
                   <Icon
                     d={ICON_PATHS[it.icon]}
@@ -137,10 +139,10 @@ export function Shell({
                     stroke={on ? 'rgb(var(--tinta))' : 'rgb(var(--tinta3))'}
                   />
                   <span
-                    className="text-[10px]"
+                    className="w-full truncate text-center text-[10px]"
                     style={{ fontWeight: on ? 700 : 500, color: on ? 'rgb(var(--tinta))' : 'rgb(var(--tinta3))' }}
                   >
-                    {it.label}
+                    {it.corta ?? it.label}
                   </span>
                 </Link>
               );

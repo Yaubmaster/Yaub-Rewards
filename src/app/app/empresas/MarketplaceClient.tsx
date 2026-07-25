@@ -3,30 +3,14 @@
 // Marketplace del vendedor en tres niveles:
 //   cuenta (tenant) → agentes/empresas de esa cuenta → ofertas del agente
 // Suscribirse a una empresa es suscribirse a su agente.
+import Link from 'next/link';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { supabaseBrowser } from '@/lib/supabase/client';
+import { Avatar } from '@/components/Avatar';
+import { BotonFavorita, Canales, OfertaDetalle } from '@/components/OfertaDetalle';
 import { Icon, ICON_PATHS } from '@/components/icons';
 import { mxn } from '@/lib/format';
-
-export interface OfertaPublicada {
-  oferta_id: string;
-  producto: string;
-  descripcion: string | null;
-  comision_mxn: number;
-  precio_mxn: number | null;
-  condicion: string | null;
-  capacitacion: string;
-  fotos: string[];
-  empresa_id: string;
-  empresa: string;
-  assistant_id: string | null;
-  agente: string | null;
-  canales: string[];
-  agente_activo: boolean;
-  tenant_id: string | null;
-  publicado_por: string;
-  suscrito: boolean;
-}
+import { alternarFavorita, cargarOfertas, type OfertaPublicada } from '@/lib/ofertas';
 
 const VISTOS_KEY = 'rewards_agentes_vistos';
 
@@ -38,35 +22,6 @@ const leerVistos = (): string[] => {
   }
 };
 
-/** Foquito por canal encendido del agente. */
-function Canales({ canales, activo }: { canales: string[]; activo: boolean }) {
-  const mapa: Record<string, { txt: string; color: string }> = {
-    whatsapp: { txt: 'WhatsApp', color: '#25D366' },
-    web: { txt: 'Chat web', color: '#00D4FF' },
-    voice: { txt: 'Voz', color: '#8B5CF6' },
-    voz: { txt: 'Voz', color: '#8B5CF6' },
-    telegram: { txt: 'Telegram', color: '#0EA5E9' },
-  };
-  const unicos = Array.from(new Set(canales ?? [])).filter((c) => mapa[c]);
-  if (unicos.length === 0) return null;
-  return (
-    <div className="flex flex-wrap items-center gap-1.5">
-      {unicos.map((c) => (
-        <span
-          key={c}
-          className="flex items-center gap-1.5 rounded-full border border-line px-2 py-[3px] text-[10.5px] font-bold text-slate2"
-        >
-          <span
-            className={`h-1.5 w-1.5 rounded-full ${activo ? 'animate-pulseDot' : ''}`}
-            style={{ background: activo ? mapa[c].color : '#94A3B8' }}
-          />
-          {mapa[c].txt}
-        </span>
-      ))}
-    </div>
-  );
-}
-
 export function MarketplaceClient({ freelancerId }: { freelancerId: string }) {
   const [ofertas, setOfertas] = useState<OfertaPublicada[] | null>(null);
   const [busqueda, setBusqueda] = useState('');
@@ -74,11 +29,11 @@ export function MarketplaceClient({ freelancerId }: { freelancerId: string }) {
   const [empresaAbierta, setEmpresaAbierta] = useState<string | null>(null);
   const [vistos, setVistos] = useState<string[]>([]);
   const [ocupado, setOcupado] = useState<string | null>(null);
+  const [abierta, setAbierta] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
   const cargar = useCallback(async () => {
-    const supabase = supabaseBrowser();
-    const { data } = await supabase.rpc('ofertas_publicadas');
-    setOfertas((data ?? []) as unknown as OfertaPublicada[]);
+    setOfertas(await cargarOfertas());
   }, []);
 
   useEffect(() => {
@@ -111,6 +66,20 @@ export function MarketplaceClient({ freelancerId }: { freelancerId: string }) {
     await cargar();
   };
 
+  const favorita = async (o: OfertaPublicada) => {
+    setOcupado(o.oferta_id);
+    setError(null);
+    try {
+      await alternarFavorita(freelancerId, o.oferta_id, o.favorita);
+      await cargar();
+    } catch (e) {
+      setError((e as Error).message);
+      setTimeout(() => setError(null), 3200);
+    } finally {
+      setOcupado(null);
+    }
+  };
+
   // Busca por agente, empresa, cuenta o producto
   const filtradas = useMemo(() => {
     const q = busqueda.trim().toLowerCase();
@@ -123,10 +92,14 @@ export function MarketplaceClient({ freelancerId }: { freelancerId: string }) {
   }, [ofertas, busqueda]);
 
   const porTenant = useMemo(() => {
-    const mapa = new Map<string, { nombre: string; empresas: Map<string, OfertaPublicada[]> }>();
+    const mapa = new Map<
+      string,
+      { nombre: string; avatar: string | null; empresas: Map<string, OfertaPublicada[]> }
+    >();
     for (const o of filtradas) {
       const tk = o.tenant_id ?? o.publicado_por;
-      if (!mapa.has(tk)) mapa.set(tk, { nombre: o.publicado_por, empresas: new Map() });
+      if (!mapa.has(tk))
+        mapa.set(tk, { nombre: o.publicado_por, avatar: o.tenant_avatar, empresas: new Map() });
       const t = mapa.get(tk)!;
       if (!t.empresas.has(o.empresa_id)) t.empresas.set(o.empresa_id, []);
       t.empresas.get(o.empresa_id)!.push(o);
@@ -140,6 +113,13 @@ export function MarketplaceClient({ freelancerId }: { freelancerId: string }) {
     return vistos.map((id) => cab.get(id)).filter(Boolean).slice(0, 3) as OfertaPublicada[];
   }, [vistos, ofertas]);
 
+  const detalle = useMemo(
+    () => (ofertas ?? []).find((o) => o.oferta_id === abierta) ?? null,
+    [ofertas, abierta],
+  );
+
+  const guardadas = (ofertas ?? []).filter((o) => o.favorita).length;
+
   if (!ofertas) {
     return (
       <div className="flex flex-col gap-3">
@@ -152,10 +132,23 @@ export function MarketplaceClient({ freelancerId }: { freelancerId: string }) {
 
   return (
     <div className="animate-fadeUpFast">
-      <h1 className="text-[22px] font-extrabold tracking-tight">Empresas</h1>
-      <p className="mt-0.5 text-[13px] text-slate2">
-        Cada empresa es un agente de IA. Suscríbete y refiérele clientes con tu código.
-      </p>
+      <div className="flex flex-wrap items-start justify-between gap-3">
+        <div>
+          <h1 className="text-[22px] font-extrabold tracking-tight">Empresas</h1>
+          <p className="mt-0.5 text-[13px] text-slate2">
+            Cada empresa es un agente de IA. Suscríbete y refiérele clientes con tu código.
+          </p>
+        </div>
+        {guardadas > 0 && (
+          <Link
+            href="/app/mis-ofertas"
+            className="flex items-center gap-2 rounded-xl border border-line px-3.5 py-2 text-[12.5px] font-bold text-slate2 transition-colors hover:border-cyan1 hover:text-[#0EA5E9]"
+          >
+            <Icon d={ICON_PATHS.heart} size={14} strokeWidth={2} />
+            Mis ofertas ({guardadas})
+          </Link>
+        )}
+      </div>
 
       <input
         className="input-yaub mt-4"
@@ -163,6 +156,12 @@ export function MarketplaceClient({ freelancerId }: { freelancerId: string }) {
         value={busqueda}
         onChange={(e) => setBusqueda(e.target.value)}
       />
+
+      {error && (
+        <div className="mt-3 rounded-2xl border border-[rgba(245,158,11,.4)] bg-[rgba(245,158,11,.08)] px-4 py-3 text-[13px] font-semibold text-[#B45309]">
+          {error}
+        </div>
+      )}
 
       {recientes.length > 0 && !busqueda && (
         <>
@@ -175,10 +174,13 @@ export function MarketplaceClient({ freelancerId }: { freelancerId: string }) {
                   setTenantAbierto(o.tenant_id ?? o.publicado_por);
                   abrirEmpresa(o.empresa_id);
                 }}
-                className="card shrink-0 px-3.5 py-2.5 text-left transition-colors hover:border-cyan1"
+                className="card flex shrink-0 items-center gap-2.5 px-3.5 py-2.5 text-left transition-colors hover:border-cyan1"
               >
-                <div className="text-[13px] font-bold">{o.empresa}</div>
-                <div className="text-[11px] text-slate3">{o.publicado_por}</div>
+                <Avatar url={o.agente_avatar} nombre={o.empresa} size={30} icono="bot" />
+                <div>
+                  <div className="text-[13px] font-bold">{o.empresa}</div>
+                  <div className="text-[11px] text-slate3">{o.publicado_por}</div>
+                </div>
               </button>
             ))}
           </div>
@@ -201,9 +203,7 @@ export function MarketplaceClient({ freelancerId }: { freelancerId: string }) {
                 onClick={() => setTenantAbierto(abierto && !busqueda ? null : tk)}
                 className="flex w-full items-center gap-3 p-4 text-left"
               >
-                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-badge text-[15px] font-extrabold text-white">
-                  {t.nombre.slice(0, 1).toUpperCase()}
-                </div>
+                <Avatar url={t.avatar} nombre={t.nombre} size={40} />
                 <div className="min-w-0 flex-1">
                   <div className="truncate text-[15px] font-bold">{t.nombre}</div>
                   <div className="text-xs text-slate3">{n === 1 ? '1 agente' : `${n} agentes`}</div>
@@ -227,9 +227,7 @@ export function MarketplaceClient({ freelancerId }: { freelancerId: string }) {
                           onClick={() => abrirEmpresa(empresaId)}
                           className="flex w-full items-center gap-3 p-3.5 text-left"
                         >
-                          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-badge">
-                            <Icon d={ICON_PATHS.bot} size={17} stroke="#fff" strokeWidth={2} />
-                          </div>
+                          <Avatar url={cab.agente_avatar} nombre={cab.empresa} size={36} icono="bot" />
                           <div className="min-w-0 flex-1">
                             <div className="truncate text-[14px] font-bold">{cab.empresa}</div>
                             <div className="mt-1">
@@ -251,22 +249,44 @@ export function MarketplaceClient({ freelancerId }: { freelancerId: string }) {
                             <div className="flex flex-col gap-2.5">
                               {lista.map((o) => (
                                 <div key={o.oferta_id} className="rounded-xl bg-surface p-3">
-                                  <div className="text-[13.5px] font-bold">{o.producto}</div>
-                                  {o.descripcion && (
-                                    <div className="mt-0.5 text-[12.5px] text-slate2">
-                                      {o.descripcion}
+                                  <div className="flex items-start gap-3">
+                                    {o.fotos?.[0] && (
+                                      // eslint-disable-next-line @next/next/no-img-element
+                                      <img
+                                        src={o.fotos[0]}
+                                        alt=""
+                                        className="h-14 w-14 shrink-0 rounded-lg object-cover"
+                                      />
+                                    )}
+                                    <div className="min-w-0 flex-1">
+                                      <div className="text-[13.5px] font-bold">{o.producto}</div>
+                                      {o.descripcion && (
+                                        <div className="mt-0.5 line-clamp-2 text-[12.5px] text-slate2">
+                                          {o.descripcion}
+                                        </div>
+                                      )}
                                     </div>
-                                  )}
-                                  <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-[12px]">
+                                    <BotonFavorita
+                                      favorita={o.favorita}
+                                      suscrito={o.suscrito}
+                                      ocupado={ocupado === o.oferta_id}
+                                      onClick={() => favorita(o)}
+                                      compacto
+                                    />
+                                  </div>
+                                  <div className="mt-2 flex flex-wrap items-center justify-between gap-x-4 gap-y-1.5 text-[12px]">
                                     <span className="text-slate3">
                                       Tu comisión{' '}
                                       <b className="text-gradient text-[13px]">
                                         {mxn(o.comision_mxn)}
                                       </b>
                                     </span>
-                                    {o.condicion && (
-                                      <span className="text-slate3">Se libera: {o.condicion}</span>
-                                    )}
+                                    <button
+                                      onClick={() => setAbierta(o.oferta_id)}
+                                      className="font-bold text-[#0EA5E9] transition-colors hover:text-violet1"
+                                    >
+                                      Ver oferta completa →
+                                    </button>
                                   </div>
                                 </div>
                               ))}
@@ -302,6 +322,16 @@ export function MarketplaceClient({ freelancerId }: { freelancerId: string }) {
           );
         })}
       </div>
+
+      {detalle && (
+        <OfertaDetalle
+          oferta={detalle}
+          ocupado={ocupado === detalle.oferta_id || ocupado === detalle.empresa_id}
+          onCerrar={() => setAbierta(null)}
+          onFavorita={() => favorita(detalle)}
+          onSuscribir={() => alternar(detalle.empresa_id, false)}
+        />
+      )}
     </div>
   );
 }
