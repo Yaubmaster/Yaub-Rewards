@@ -7,6 +7,25 @@
 import { supabaseBrowser } from '@/lib/supabase/client';
 
 export const INTERACCIONES_TRIAL = 100;
+/** Plan de entrada de Yaub tras agotar la prueba (los demás se ven en platform). */
+export const PLAN_MENSUAL = '$99/mes por 500 interacciones';
+
+/** Un agente de las cuentas Yaub del usuario, con su activación en Rewards. */
+export interface AgenteDeCuenta {
+  assistant_id: string;
+  nombre: string;
+  tenant_id: string;
+  tenant: string;
+  activo: boolean;
+  widget_key: string | null;
+  activado: boolean;
+  empresa_id: string | null;
+  ofertas: number;
+  interacciones_incluidas: number;
+  interacciones_usadas: number;
+  en_trial: boolean;
+  con_plan: boolean;
+}
 
 export interface AgenteDeEmpresa {
   id: string;
