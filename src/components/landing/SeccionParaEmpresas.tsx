@@ -18,7 +18,9 @@ export function SeccionParaEmpresas() {
             <li>Solo participas cuando la IA cierra una venta real</li>
             <li>Crea tu propio agente de IA gratis por 7 días: nombre + prompt y listo</li>
           </ul>
-          <Link className="btn btn-p" href="/registro/empresa" data-r="">
+          {/* Crear un agente exige cuenta: se pasa por login (y de ahí a registro
+              si no la tiene) y se aterriza en su consola de agentes. */}
+          <Link className="btn btn-p" href="/login?next=/empresa/agentes" data-r="">
             Crear mi agente gratis
           </Link>
         </div>

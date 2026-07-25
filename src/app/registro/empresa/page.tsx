@@ -160,7 +160,7 @@ export default function RegistroEmpresa({
       className="flex min-h-screen items-center justify-center p-6"
       style={{
         background:
-          'radial-gradient(1200px 600px at 50% -10%, rgba(0,212,255,.08), transparent), radial-gradient(900px 500px at 80% 110%, rgba(139,92,246,.07), transparent), #FFFFFF',
+          'radial-gradient(1200px 600px at 50% -10%, rgba(0,212,255,.08), transparent), radial-gradient(900px 500px at 80% 110%, rgba(139,92,246,.07), transparent), rgb(var(--fondo))',
       }}
     >
       <div className="w-full max-w-[420px]">

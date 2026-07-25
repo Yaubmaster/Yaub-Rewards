@@ -1,4 +1,4 @@
-import { r } from './reveal';
+import { ICONO_YAUB, r } from './reveal';
 import type { CSSProperties } from 'react';
 
 // Customer journey de los dos targets. Cada columna se anima al entrar en
@@ -9,7 +9,8 @@ import type { CSSProperties } from 'react';
 // de una comisión de $150 (la del ejemplo de Yaub Móvil del hero) y las dos
 // columnas cuadran entre sí — 10 vendedores × 3 ventas = las 30 de la empresa.
 interface Paso {
-  icono: string;
+  /** Emoji del nodo, o `logo` para usar el ícono oficial de Yaub */
+  icono: string | 'logo';
   titulo: string;
   detalle: string;
   dato?: string;
@@ -24,7 +25,7 @@ const VENDEDOR: Paso[] = [
 
 const EMPRESA: Paso[] = [
   { icono: '🏷️', titulo: 'Publicas tu producto', detalle: 'Gratis. Tú defines la comisión por venta', dato: '$0 de alta' },
-  { icono: '🤖', titulo: 'Creas tu agente', detalle: 'Nombre y prompt: queda listo enseguida', dato: '2 min' },
+  { icono: 'logo', titulo: 'Creas tu agente', detalle: 'Nombre y prompt: queda listo enseguida', dato: '2 min' },
   { icono: '📣', titulo: 'La red te promueve', detalle: 'Cada vendedor comparte tu oferta con su código', dato: '10 vendedores' },
   { icono: '✅', titulo: 'El agente cierra por ti', detalle: 'Atiende, cotiza y cobra sin descanso', dato: '24/7' },
 ];
@@ -68,7 +69,7 @@ function Columna({
         {pasos.map((p, i) => (
           <li className="jstep" key={p.titulo} style={{ '--i': i } as CSSProperties}>
             <span className="jnode" aria-hidden="true">
-              {p.icono}
+              {p.icono === 'logo' ? <img src={ICONO_YAUB} alt="" /> : p.icono}
             </span>
             <div className="jtexto">
               <b>{p.titulo}</b>
@@ -100,7 +101,7 @@ export function SeccionJourney() {
       <p className="kicker" data-r="">
         Dos caminos, un mismo agente
       </p>
-      <h2 data-r="">Lo que podría pasar.</h2>
+      <h2 data-r="">Así se ve Yaub Rewards en acción.</h2>
       <p className="lead" data-r="">
         Ya seas vendedor o empresa, el agente hace el trabajo pesado. Así se vería tu recorrido
         desde el día uno.
