@@ -5,6 +5,7 @@ import { supabaseBrowser } from '@/lib/supabase/client';
 import { AnimatedNumber } from '@/components/AnimatedNumber';
 import { WeeklyChart } from '@/components/WeeklyChart';
 import { CodigoPill } from '@/components/CodigoBadge';
+import { ReferidosCard } from '@/components/ReferidosCard';
 import { Icon, ICON_PATHS } from '@/components/icons';
 import { telEnmascarado, tiempoRelativo } from '@/lib/format';
 import type { Freelancer, Referido } from '@/lib/types';
@@ -152,6 +153,9 @@ export function InicioClient({
           <div className="mt-0.5 text-[13px] text-slate2">Se liberan con la primera recarga</div>
         </div>
       </div>
+
+      {/* Referidos de vendedores (gamificado) */}
+      <ReferidosCard freelancerId={freelancer.id} codigo={freelancer.codigo} />
 
       {/* Actividad semanal */}
       <div className="card mt-3.5 p-[22px]">

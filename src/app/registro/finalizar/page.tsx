@@ -64,13 +64,24 @@ export default function FinalizarRegistro() {
         return;
       }
 
-      // Freelancer (default)
-      const { data: nuevo, error } = await supabase
+      // Freelancer (default). El código de referido viene de la metadata del
+      // signup; si por alguna razón ya no es válido, reintenta sin código para
+      // no bloquear el registro.
+      let { data: nuevo, error } = await supabase
         .rpc('registrar_freelancer', {
           p_nombre: meta.full_name || user.email?.split('@')[0] || 'Vendedor',
           p_telefono: meta.phone ?? null,
+          p_codigo_referido: meta.codigo_referido ?? null,
         })
         .single();
+      if (error?.message?.includes('codigo_invalido')) {
+        ({ data: nuevo, error } = await supabase
+          .rpc('registrar_freelancer', {
+            p_nombre: meta.full_name || user.email?.split('@')[0] || 'Vendedor',
+            p_telefono: meta.phone ?? null,
+          })
+          .single());
+      }
       if (error || !nuevo) {
         setPaso('error');
         return;

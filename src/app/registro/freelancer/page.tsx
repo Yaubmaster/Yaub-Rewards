@@ -1,21 +1,32 @@
 'use client';
 
-import { useState } from 'react';
+import { Suspense, useEffect, useState } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { supabaseBrowser } from '@/lib/supabase/client';
 import { PasoCodigo, PasoEmpresas } from '@/components/onboarding/PasosFreelancer';
 import type { Freelancer } from '@/lib/types';
 
 type Paso = 'datos' | 'confirmar' | 'codigo' | 'empresas';
 
-export default function RegistroFreelancer() {
+function RegistroFreelancerForm() {
+  const params = useSearchParams();
   const [paso, setPaso] = useState<Paso>('datos');
   const [nombre, setNombre] = useState('');
   const [telefono, setTelefono] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  // Código de referido de otro vendedor (opcional). Se pre-llena con ?ref=CODIGO
+  // del link compartido por WhatsApp.
+  const [codigoRef, setCodigoRef] = useState('');
   const [cargando, setCargando] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [freelancer, setFreelancer] = useState<Freelancer | null>(null);
+
+  useEffect(() => {
+    const ref = params.get('ref');
+    if (ref) setCodigoRef(ref.toUpperCase());
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const registrar = async () => {
     setError(null);
@@ -29,7 +40,14 @@ export default function RegistroFreelancer() {
       {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password, nombre, telefono, rol: 'freelancer' }),
+        body: JSON.stringify({
+          email,
+          password,
+          nombre,
+          telefono,
+          rol: 'freelancer',
+          codigo_referido: codigoRef.trim() || null,
+        }),
       },
     ).catch(() => null);
     const out = res ? await res.json().catch(() => null) : null;
@@ -38,7 +56,9 @@ export default function RegistroFreelancer() {
       setError(
         out?.error === 'ya_existe'
           ? 'Ese correo ya tiene cuenta. Inicia sesión.'
-          : out?.error ?? 'No se pudo crear tu cuenta. Intenta de nuevo.',
+          : out?.error === 'codigo_invalido'
+            ? 'Ese código de vendedor no existe. Revísalo o déjalo vacío.'
+            : out?.error ?? 'No se pudo crear tu cuenta. Intenta de nuevo.',
       );
       return;
     }
@@ -51,11 +71,19 @@ export default function RegistroFreelancer() {
     }
 
     const { data: fl, error: rpcErr } = await supabase
-      .rpc('registrar_freelancer', { p_nombre: nombre, p_telefono: telefono })
+      .rpc('registrar_freelancer', {
+        p_nombre: nombre,
+        p_telefono: telefono,
+        p_codigo_referido: codigoRef.trim() || null,
+      })
       .single();
     setCargando(false);
     if (rpcErr || !fl) {
-      setError('No se pudo crear tu perfil. Intenta de nuevo.');
+      setError(
+        rpcErr?.message?.includes('codigo_invalido')
+          ? 'Ese código de vendedor no existe. Revísalo o déjalo vacío.'
+          : 'No se pudo crear tu perfil. Intenta de nuevo.',
+      );
       return;
     }
     setFreelancer(fl as Freelancer);
@@ -80,6 +108,24 @@ export default function RegistroFreelancer() {
               <input className="input-yaub" placeholder="Teléfono (WhatsApp)" value={telefono} onChange={(e) => setTelefono(e.target.value)} autoComplete="tel" />
               <input className="input-yaub" placeholder="Correo" type="email" value={email} onChange={(e) => setEmail(e.target.value)} autoComplete="email" />
               <input className="input-yaub" placeholder="Contraseña (mínimo 8 caracteres)" type="password" value={password} onChange={(e) => setPassword(e.target.value)} autoComplete="new-password" />
+              <div className="mt-1">
+                <div className="mb-1.5 text-xs font-semibold text-slate3">
+                  ¿TIENES CÓDIGO DE UN VENDEDOR? <span className="font-medium">(opcional)</span>
+                </div>
+                <input
+                  className="input-yaub uppercase"
+                  placeholder="Ej. JUAN-01"
+                  value={codigoRef}
+                  onChange={(e) => setCodigoRef(e.target.value.toUpperCase())}
+                  maxLength={12}
+                />
+                {codigoRef && (
+                  <p className="mt-1.5 text-[12px] font-medium text-[#0284C7]">
+                    🎁 Al registrarte con código te abonamos <b>$50 MXN</b> (se liberan al cobrar
+                    tu 3ª comisión).
+                  </p>
+                )}
+              </div>
             </div>
             {error && <p className="mt-3 text-[13px] font-medium text-red-500">{error}</p>}
             <button
@@ -112,5 +158,13 @@ export default function RegistroFreelancer() {
         {paso === 'empresas' && freelancer && <PasoEmpresas freelancerId={freelancer.id} />}
       </div>
     </div>
+  );
+}
+
+export default function RegistroFreelancer() {
+  return (
+    <Suspense>
+      <RegistroFreelancerForm />
+    </Suspense>
   );
 }

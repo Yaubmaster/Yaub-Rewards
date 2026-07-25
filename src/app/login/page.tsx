@@ -102,9 +102,18 @@ function LoginForm() {
       <button
         onClick={entrar}
         disabled={cargando || !email || (modo === 'password' && !password)}
-        className="btn-gradient mt-[18px] w-full py-[15px] text-base disabled:opacity-60"
+        className="btn-gradient mt-[18px] flex w-full items-center justify-center gap-2.5 py-[15px] text-base disabled:opacity-60"
       >
-        {cargando ? 'Un momento…' : modo === 'password' ? 'Entrar' : 'Enviarme enlace mágico'}
+        {cargando ? (
+          'Un momento…'
+        ) : modo === 'password' ? (
+          <>
+            <img src="/rewards/yaub-icon.png" alt="" className="h-5 w-auto brightness-0 invert" />
+            Entrar con Yaub
+          </>
+        ) : (
+          'Enviarme enlace mágico'
+        )}
       </button>
 
       <div className="mt-5 flex items-center gap-3">
