@@ -123,6 +123,53 @@ async function recompilarContexto(svc: SupabaseClient, assistantId: string) {
   if (upErr) throw new Error(`no se pudo actualizar el prompt: ${upErr.message}`);
 }
 
+// Vuelca las ofertas activas de la empresa como contexto del agente: qué vende,
+// a qué precio, cuánto paga de comisión y con qué condición se libera. Se
+// guarda como una entrada de conocimiento (idempotente por título) para que
+// entre al bloque de contexto del prompt junto con sitios y documentos.
+async function sincronizarOfertas(
+  svc: SupabaseClient,
+  svcRewards: SupabaseClient,
+  assistantId: string,
+  empresaId: string,
+) {
+  const { data: ofertas } = await svcRewards
+    .from("ofertas")
+    .select("producto, descripcion, precio_mxn, comision_mxn, condicion_liberacion")
+    .eq("empresa_id", empresaId)
+    .eq("activa", true);
+
+  const TITULO = "Catálogo y comisiones";
+  await svc
+    .from("assistant_knowledge")
+    .delete()
+    .eq("assistant_id", assistantId)
+    .eq("title", TITULO)
+    .filter("metadata->>source", "eq", "rewards");
+
+  if ((ofertas ?? []).length > 0) {
+    const lineas = (ofertas ?? []).map((o) => {
+      const partes = [`- ${o.producto}`];
+      if (o.descripcion) partes.push(`  ${o.descripcion}`);
+      if (o.precio_mxn) partes.push(`  Precio: $${o.precio_mxn} MXN`);
+      partes.push(`  Comisión al vendedor: $${o.comision_mxn} MXN`);
+      if (o.condicion_liberacion) partes.push(`  Se libera cuando: ${o.condicion_liberacion}`);
+      return partes.join("\n");
+    });
+    await svc.from("assistant_knowledge").insert({
+      assistant_id: assistantId,
+      title: TITULO,
+      content:
+        `Esto es lo que vendes. Al cerrar una venta pregunta siempre quién refirió al cliente ` +
+        `y registra su código de vendedor.\n\n${lineas.join("\n\n")}`,
+      content_type: "text",
+      metadata: { source: "rewards", tipo: "ofertas" },
+    });
+  }
+
+  await recompilarContexto(svc, assistantId);
+}
+
 // Regenera assistants.catalog_instructions con las condiciones de las imágenes.
 async function sincronizarCatalogInstructions(svc: SupabaseClient, assistantId: string) {
   const { data: imgs } = await svc
@@ -175,7 +222,7 @@ Deno.serve(async (req) => {
   // La empresa debe ser del usuario
   const { data: empresa, error: empErr } = await svcRewards
     .from("empresas")
-    .select("id, user_id, nombre, tenant_id, estado")
+    .select("id, user_id, nombre, tenant_id, estado, assistant_id")
     .eq("id", empresaId)
     .single();
   if (empErr || !empresa) return json({ ok: false, error: "Empresa no encontrada" }, 404);
@@ -253,6 +300,11 @@ Deno.serve(async (req) => {
         if (!nombre) return json({ ok: false, error: "Ponle nombre a tu agente" }, 400);
         if (!prompt) return json({ ok: false, error: "Describe qué debe hacer tu agente" }, 400);
 
+        // Una empresa = un agente
+        if (empresa.assistant_id) {
+          return json({ ok: false, error: "Esta empresa ya tiene su agente" }, 409);
+        }
+
         const tenantId = await ensureTenant();
 
         // Modelo default del registry (is_recommended); fallback al default de la tabla
@@ -301,6 +353,13 @@ Deno.serve(async (req) => {
           .single();
         if (insErr || !asst) throw new Error(`No se pudo crear el agente: ${insErr?.message}`);
 
+        // El agente ES la empresa: se ligan 1:1
+        const { error: ligaErr } = await svcRewards
+          .from("empresas")
+          .update({ assistant_id: asst.id })
+          .eq("id", empresaId);
+        if (ligaErr) console.error("no se pudo ligar empresa↔agente:", ligaErr.message);
+
         const { data: trial, error: trialErr } = await svcRewards
           .from("agentes_trial")
           .insert({ assistant_id: asst.id, empresa_id: empresaId, tenant_id: tenantId })
@@ -308,7 +367,18 @@ Deno.serve(async (req) => {
           .single();
         if (trialErr) console.error("trial insert falló:", trialErr.message);
 
+        // Las ofertas de la empresa son el catálogo que el agente vende:
+        // entran como contexto para que sepa qué ofrece y con qué condición.
+        await sincronizarOfertas(svc, svcRewards, asst.id, empresaId);
+
         return json({ ok: true, agente: asst, trial: trial ?? null });
+      }
+
+      case "sync_ofertas": {
+        const tenantId = await ensureTenant();
+        const asst = await assistantDelTenant(tenantId);
+        await sincronizarOfertas(svc, svcRewards, asst.id, empresaId);
+        return json({ ok: true });
       }
 
       case "add_website": {

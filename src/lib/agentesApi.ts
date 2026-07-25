@@ -1,26 +1,33 @@
-// Cliente del backend de la consola "Agentes Yaub Conectados"
-// (edge function rewards-agentes). Solo se usa desde componentes cliente.
+// Cliente de la consola "Agentes Yaub Conectados".
+//
+// Modelo: cada EMPRESA de Rewards es UN agente (1:1). El listado sale del RPC
+// `mis_empresas_agentes` (una sola llamada, ya trae el consumo del trial); las
+// escrituras van por la edge function `rewards-agentes`, que valida la sesión y
+// escribe con service role.
 import { supabaseBrowser } from '@/lib/supabase/client';
 
-export interface TrialInfo {
-  assistant_id: string;
-  trial_started_at: string;
-  trial_ends_at: string;
-  paused_at: string | null;
-  activated_at: string | null;
+export const INTERACCIONES_TRIAL = 100;
+
+export interface AgenteDeEmpresa {
+  id: string;
+  nombre: string;
+  activo: boolean;
+  widget_key: string | null;
+  interacciones_incluidas: number;
+  interacciones_usadas: number;
+  trial_activo: boolean;
+  activado: boolean;
+  pausado: boolean;
 }
 
-export interface AgenteResumen {
-  id: string;
-  name: string;
-  slug: string;
-  is_active: boolean;
-  created_at: string;
-  avatar_url: string | null;
-  widget_public_key: string | null;
-  widget_config: { enabled?: boolean } | null;
-  source: string;
-  trial: TrialInfo | null;
+export interface EmpresaConAgente {
+  empresa_id: string;
+  empresa: string;
+  estado: 'en_revision' | 'autorizada';
+  creada: string;
+  tenant_id: string | null;
+  ofertas: number;
+  agente: AgenteDeEmpresa | null;
 }
 
 export interface ContextoConocimiento {
@@ -29,7 +36,7 @@ export interface ContextoConocimiento {
   content_type: string;
   file_url: string | null;
   created_at: string;
-  metadata: { texto_extraido?: boolean; url?: string } | null;
+  metadata: { texto_extraido?: boolean; url?: string; tipo?: string } | null;
 }
 
 export interface ContextoImagen {
@@ -38,6 +45,14 @@ export interface ContextoImagen {
   description: string | null;
   image_url: string;
   created_at: string;
+}
+
+/** Empresas del usuario con su agente y el consumo del trial. */
+export async function misEmpresasAgentes(): Promise<EmpresaConAgente[]> {
+  const supabase = supabaseBrowser();
+  const { data, error } = await supabase.rpc('mis_empresas_agentes');
+  if (error) throw new Error('No pudimos cargar tus agentes. Intenta de nuevo.');
+  return (data ?? []) as unknown as EmpresaConAgente[];
 }
 
 export async function agentesApi<T = Record<string, unknown>>(
@@ -64,20 +79,17 @@ export async function agentesApi<T = Record<string, unknown>>(
   return out;
 }
 
-// Días de prueba restantes (0 si ya venció)
-export function diasRestantes(trial: TrialInfo | null): number {
-  if (!trial) return 0;
-  const ms = new Date(trial.trial_ends_at).getTime() - Date.now();
-  return Math.max(0, Math.ceil(ms / 86_400_000));
+export type EstadoAgente = 'sin_agente' | 'prueba' | 'activo' | 'agotado';
+
+export function estadoAgente(a: AgenteDeEmpresa | null): EstadoAgente {
+  if (!a) return 'sin_agente';
+  if (a.activado) return 'activo';
+  if (a.pausado || a.interacciones_usadas >= a.interacciones_incluidas) return 'agotado';
+  return 'prueba';
 }
 
-export type EstadoAgente = 'activo' | 'prueba' | 'pausado';
-
-export function estadoAgente(a: AgenteResumen): EstadoAgente {
-  if (a.trial?.activated_at) return 'activo';
-  if (a.trial) {
-    if (a.trial.paused_at || !a.is_active || diasRestantes(a.trial) === 0) return 'pausado';
-    return 'prueba';
-  }
-  return a.is_active ? 'activo' : 'pausado';
+/** Interacciones gratis que le quedan al agente (0 si ya se agotaron). */
+export function interaccionesRestantes(a: AgenteDeEmpresa | null): number {
+  if (!a) return 0;
+  return Math.max(0, a.interacciones_incluidas - a.interacciones_usadas);
 }

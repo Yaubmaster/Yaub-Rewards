@@ -4,6 +4,7 @@ import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { supabaseBrowser } from '@/lib/supabase/client';
 import { Icon, ICON_PATHS } from '@/components/icons';
+import { crearAgenteDeEmpresa } from '@/lib/crearAgenteEmpresa';
 import type { CapacitacionTipo } from '@/lib/types';
 
 type Paso = 'datos' | 'oferta' | 'confirmar' | 'revision';
@@ -70,12 +71,23 @@ export default function RegistroEmpresa({
         p_adicional: esNueva,
       })
       .single();
-    setCargando(false);
     if (rpcErr || !data) {
+      setCargando(false);
       setError('No se pudo registrar la empresa. Intenta de nuevo.');
       return;
     }
-    setAprobada((data as { estado?: string }).estado === 'autorizada');
+
+    // Cada empresa es un agente: se le crea junto con su catálogo de ofertas.
+    const empresa = data as { id: string; estado?: string };
+    await crearAgenteDeEmpresa({
+      empresaId: empresa.id,
+      nombre,
+      giro,
+      producto,
+    });
+
+    setCargando(false);
+    setAprobada(empresa.estado === 'autorizada');
     setPaso('revision');
   };
 

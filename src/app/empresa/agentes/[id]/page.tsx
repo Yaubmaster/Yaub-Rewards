@@ -1,6 +1,5 @@
 import { redirect } from 'next/navigation';
 import { supabaseServer } from '@/lib/supabase/server';
-import { empresaActiva } from '@/lib/empresa';
 import { AgenteDetalleClient } from './AgenteDetalleClient';
 
 export const dynamic = 'force-dynamic';
@@ -11,8 +10,7 @@ export default async function AgenteDetallePage({ params }: { params: { id: stri
     data: { user },
   } = await supabase.auth.getUser();
   if (!user) redirect('/login');
-  const { empresa } = await empresaActiva(supabase, user.id);
-  if (!empresa) redirect('/registro/finalizar');
 
-  return <AgenteDetalleClient empresaId={empresa.id} assistantId={params.id} />;
+  // La empresa dueña se resuelve desde el agente (1:1) en el cliente
+  return <AgenteDetalleClient assistantId={params.id} />;
 }

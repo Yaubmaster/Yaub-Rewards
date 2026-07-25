@@ -10,11 +10,12 @@ import { supabaseBrowser } from '@/lib/supabase/client';
 import { Icon, ICON_PATHS } from '@/components/icons';
 import {
   agentesApi,
-  diasRestantes,
   estadoAgente,
-  type AgenteResumen,
+  interaccionesRestantes,
+  misEmpresasAgentes,
   type ContextoConocimiento,
   type ContextoImagen,
+  type EmpresaConAgente,
 } from '@/lib/agentesApi';
 
 const PLATAFORMA_URL = 'https://platform.yaub.ai';
@@ -182,7 +183,7 @@ function Seccion({
     <details className="card group p-0">
       <summary className="flex cursor-pointer list-none items-center gap-3 p-4 [&::-webkit-details-marker]:hidden">
         <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-line bg-surface">
-          <Icon d={ICON_PATHS[icono]} size={18} stroke="#0A0A0F" />
+          <Icon d={ICON_PATHS[icono]} size={18} stroke="rgb(var(--tinta))" />
         </div>
         <div className="min-w-0 flex-1">
           <div className="text-sm font-bold">{titulo}</div>
@@ -196,14 +197,10 @@ function Seccion({
 }
 
 // ── Pantalla completa ─────────────────────────────────────────────────────────
-export function AgenteDetalleClient({
-  empresaId,
-  assistantId,
-}: {
-  empresaId: string;
-  assistantId: string;
-}) {
-  const [agente, setAgente] = useState<AgenteResumen | null>(null);
+export function AgenteDetalleClient({ assistantId }: { assistantId: string }) {
+  // La empresa se resuelve desde el agente (1:1), no desde la cookie de empresa
+  // activa: así funciona aunque entres desde el listado de otra empresa.
+  const [item, setItem] = useState<EmpresaConAgente | null>(null);
   const [cargando, setCargando] = useState(true);
   const [errorPagina, setErrorPagina] = useState<string | null>(null);
 
@@ -218,17 +215,15 @@ export function AgenteDetalleClient({
 
   const cargar = useCallback(async () => {
     try {
-      const [lista, ctx] = await Promise.all([
-        agentesApi<{ agentes: AgenteResumen[] }>({ action: 'list', empresa_id: empresaId }),
-        agentesApi<{ conocimiento: ContextoConocimiento[]; imagenes: ContextoImagen[] }>({
-          action: 'list_context',
-          empresa_id: empresaId,
-          assistant_id: assistantId,
-        }),
-      ]);
-      const a = lista.agentes.find((x) => x.id === assistantId);
-      if (!a) throw new Error('Ese agente no es de tu empresa');
-      setAgente(a);
+      const empresas = await misEmpresasAgentes();
+      const propia = empresas.find((e) => e.agente?.id === assistantId);
+      if (!propia) throw new Error('Ese agente no es de una de tus empresas');
+      setItem(propia);
+
+      const ctx = await agentesApi<{
+        conocimiento: ContextoConocimiento[];
+        imagenes: ContextoImagen[];
+      }>({ action: 'list_context', empresa_id: propia.empresa_id, assistant_id: assistantId });
       setConocimiento(ctx.conocimiento);
       setImagenes(ctx.imagenes);
     } catch (e) {
@@ -236,7 +231,7 @@ export function AgenteDetalleClient({
     } finally {
       setCargando(false);
     }
-  }, [empresaId, assistantId]);
+  }, [assistantId]);
 
   useEffect(() => {
     cargar();
@@ -250,7 +245,7 @@ export function AgenteDetalleClient({
   const agregarSitio = async () => {
     setOcupado('sitio');
     try {
-      await agentesApi({ action: 'add_website', empresa_id: empresaId, assistant_id: assistantId, url: urlSitio });
+      await agentesApi({ action: 'add_website', empresa_id: item!.empresa_id, assistant_id: assistantId, url: urlSitio });
       setUrlSitio('');
       flash('Sitio agregado: tu agente ya lo usa de contexto');
       await cargar();
@@ -281,7 +276,7 @@ export function AgenteDetalleClient({
       const path = await subirArchivo(file, 'doc');
       const out = await agentesApi<{ texto_extraido: boolean }>({
         action: 'add_document',
-        empresa_id: empresaId,
+        empresa_id: item!.empresa_id,
         assistant_id: assistantId,
         path,
         titulo: file.name,
@@ -310,7 +305,7 @@ export function AgenteDetalleClient({
       const path = await subirArchivo(file, 'imagen');
       await agentesApi({
         action: 'add_image',
-        empresa_id: empresaId,
+        empresa_id: item!.empresa_id,
         assistant_id: assistantId,
         path,
         nombre: imgNombre || file.name.replace(/\.[^.]+$/, ''),
@@ -329,7 +324,7 @@ export function AgenteDetalleClient({
 
   const borrar = async (tipo: 'conocimiento' | 'imagen', id: string) => {
     try {
-      await agentesApi({ action: 'delete_context', empresa_id: empresaId, assistant_id: assistantId, tipo, id });
+      await agentesApi({ action: 'delete_context', empresa_id: item!.empresa_id, assistant_id: assistantId, tipo, id });
       await cargar();
     } catch (e) {
       flash((e as Error).message);
@@ -344,7 +339,7 @@ export function AgenteDetalleClient({
       </div>
     );
   }
-  if (errorPagina || !agente) {
+  if (errorPagina || !item?.agente) {
     return (
       <div className="card p-6 text-center">
         <div className="text-lg font-bold">No encontramos ese agente</div>
@@ -356,9 +351,10 @@ export function AgenteDetalleClient({
     );
   }
 
+  const agente = item.agente;
   const estado = estadoAgente(agente);
-  const dias = diasRestantes(agente.trial);
-  const pausado = estado === 'pausado';
+  const restantes = interaccionesRestantes(agente);
+  const pausado = estado === 'agotado';
 
   return (
     <div className="animate-fadeUpFast">
@@ -372,8 +368,8 @@ export function AgenteDetalleClient({
             <Icon d={ICON_PATHS.bot} size={22} stroke="#fff" strokeWidth={2} />
           </div>
           <div>
-            <h1 className="text-[22px] font-extrabold tracking-tight">{agente.name}</h1>
-            <div className="text-xs text-slate3">Modelo recomendado de Yaub · chat web</div>
+            <h1 className="text-[22px] font-extrabold tracking-tight">{agente.nombre}</h1>
+            <div className="text-xs text-slate3">{item.empresa} · chat web</div>
           </div>
         </div>
         <a
@@ -388,21 +384,23 @@ export function AgenteDetalleClient({
       </div>
 
       {/* Estado del trial */}
-      {estado === 'prueba' && agente.trial && (
+      {estado === 'prueba' && (
         <div className="mt-4 flex items-center gap-2.5 rounded-2xl border border-[rgba(0,212,255,.35)] bg-[rgba(0,212,255,.07)] px-4 py-3 text-[13px] font-medium text-[#0369A1]">
           <span className="h-2 w-2 animate-pulseDot rounded-full bg-cyan1" />
-          {dias === 1 ? 'Te queda 1 día de prueba gratis.' : `Te quedan ${dias} días de prueba gratis.`}
-          <span className="text-[#0369A1]/70">Al terminar, el agente se pausa (no se borra).</span>
+          {restantes === 1
+            ? 'Te queda 1 interacción gratis.'
+            : `Te quedan ${restantes} de ${agente.interacciones_incluidas} interacciones gratis.`}
+          <span className="text-[#0369A1]/70">Al agotarse, el agente se pausa (no se borra).</span>
         </div>
       )}
       {pausado && (
         <div className="mt-4 rounded-2xl border border-[rgba(245,158,11,.4)] bg-[rgba(245,158,11,.08)] px-4 py-3.5">
           <div className="text-[13px] font-bold text-[#B45309]">
-            Tu prueba gratis terminó y el agente está pausado.
+Se acabaron tus {agente.interacciones_incluidas} interacciones gratis.
           </div>
           <p className="mt-0.5 text-[13px] text-[#B45309]/80">
-            Nada se borró: su prompt y contexto siguen intactos. Actívalo con Yaub para que vuelva
-            a responder.
+            Nada se borró: su prompt, su catálogo y su contexto siguen intactos. Elige un plan de
+            Yaub para que vuelva a responder.
           </p>
           <a
             href={`${PLATAFORMA_URL}/assistants/${agente.id}`}
@@ -410,7 +408,7 @@ export function AgenteDetalleClient({
             rel="noreferrer"
             className="btn-gradient mt-2.5 inline-block px-4 py-2.5 text-[13px]"
           >
-            Activar con Yaub
+            Elegir plan
           </a>
         </div>
       )}
@@ -424,8 +422,8 @@ export function AgenteDetalleClient({
       <div className="mt-5 grid gap-4 lg:grid-cols-[1fr_380px]">
         {/* Chat de prueba */}
         <div className="min-w-0">
-          {agente.widget_public_key ? (
-            <ChatPrueba widgetKey={agente.widget_public_key} pausado={pausado} />
+          {agente.widget_key ? (
+            <ChatPrueba widgetKey={agente.widget_key} pausado={pausado} />
           ) : (
             <div className="card p-6 text-center text-sm text-slate2">
               Este agente no tiene chat web habilitado. Ábrelo en Yaub para configurarlo.

@@ -6,6 +6,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { supabaseBrowser } from '@/lib/supabase/client';
 import { PasoCodigo, PasoEmpresas } from '@/components/onboarding/PasosFreelancer';
+import { crearAgenteDeEmpresa } from '@/lib/crearAgenteEmpresa';
 import type { Freelancer } from '@/lib/types';
 
 export default function FinalizarRegistro() {
@@ -48,7 +49,7 @@ export default function FinalizarRegistro() {
       const meta = (user.user_metadata ?? {}) as Record<string, string>;
       if (meta.rol === 'empresa') {
         const comisionNum = parseFloat((meta.empresa_comision ?? '').replace(/[^\d.]/g, '')) || 0;
-        const { error } = await supabase.rpc('registrar_empresa', {
+        const { data: nueva, error } = await supabase.rpc('registrar_empresa', {
           p_nombre: meta.empresa_nombre || meta.full_name || 'Mi empresa',
           p_descripcion: meta.empresa_descripcion ?? null,
           p_producto: meta.empresa_producto ?? null,
@@ -59,6 +60,16 @@ export default function FinalizarRegistro() {
         if (error) {
           setPaso('error');
           return;
+        }
+        // Cada empresa es un agente: se le crea al terminar el alta
+        const emp = nueva as { id?: string } | null;
+        if (emp?.id) {
+          await crearAgenteDeEmpresa({
+            empresaId: emp.id,
+            nombre: meta.empresa_nombre || meta.full_name || 'Mi empresa',
+            giro: meta.empresa_descripcion ?? null,
+            producto: meta.empresa_producto ?? null,
+          });
         }
         router.replace('/empresa');
         return;
