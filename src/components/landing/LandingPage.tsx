@@ -5,12 +5,10 @@
 // scroll: reveals escalonados, count-up de los stats, chat escalonado y barra
 // de progreso. El carrusel de empresas y el FAQ son CSS/HTML nativo.
 import { useEffect, useRef } from 'react';
-import type { StatsLanding } from '@/lib/statsLanding';
 import { SeccionNav } from './SeccionNav';
 import { SeccionHero } from './SeccionHero';
 import { SeccionEmpresas } from './SeccionEmpresas';
-import { SeccionStats } from './SeccionStats';
-import { SeccionPasos } from './SeccionPasos';
+import { SeccionJourney } from './SeccionJourney';
 import { SeccionReferidos } from './SeccionReferidos';
 import { SeccionParaEmpresas } from './SeccionParaEmpresas';
 import { SeccionDashboard } from './SeccionDashboard';
@@ -18,7 +16,7 @@ import { SeccionFaq } from './SeccionFaq';
 import { SeccionCtaFinal } from './SeccionCtaFinal';
 import { SeccionFooter } from './SeccionFooter';
 
-export function LandingPage({ stats }: { stats: StatsLanding }) {
+export function LandingPage() {
   const raiz = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -30,6 +28,7 @@ export function LandingPage({ stats }: { stats: StatsLanding }) {
       Math.round(v).toLocaleString('en-US', { useGrouping: !!grp });
 
     const cuadros: number[] = [];
+    const relojes: ReturnType<typeof setTimeout>[] = [];
     const countUp = (el: HTMLElement) => {
       const target = parseFloat(el.dataset.n ?? '0');
       const grp = el.dataset.grp;
@@ -37,15 +36,22 @@ export function LandingPage({ stats }: { stats: StatsLanding }) {
         el.textContent = fmt(target, grp);
         return;
       }
-      const t0 = performance.now();
-      const dur = 1400;
-      const paso = (t: number) => {
-        const p = Math.min((t - t0) / dur, 1);
-        const e = 1 - Math.pow(1 - p, 4);
-        el.textContent = fmt(target * e, grp);
-        if (p < 1) cuadros.push(requestAnimationFrame(paso));
+      // data-delay espera a que el elemento aparezca (p. ej. el resultado del
+      // journey, que entra al final de la animación de la columna)
+      const espera = parseInt(el.dataset.delay ?? '0', 10);
+      const correr = () => {
+        const t0 = performance.now();
+        const dur = 1400;
+        const paso = (t: number) => {
+          const p = Math.min((t - t0) / dur, 1);
+          const e = 1 - Math.pow(1 - p, 4);
+          el.textContent = fmt(target * e, grp);
+          if (p < 1) cuadros.push(requestAnimationFrame(paso));
+        };
+        cuadros.push(requestAnimationFrame(paso));
       };
-      cuadros.push(requestAnimationFrame(paso));
+      if (espera > 0) relojes.push(setTimeout(correr, espera));
+      else correr();
     };
 
     const io = new IntersectionObserver(
@@ -63,6 +69,7 @@ export function LandingPage({ stats }: { stats: StatsLanding }) {
     return () => {
       io.disconnect();
       cuadros.forEach(cancelAnimationFrame);
+      relojes.forEach(clearTimeout);
     };
   }, []);
 
@@ -78,8 +85,7 @@ export function LandingPage({ stats }: { stats: StatsLanding }) {
       <main>
         <SeccionHero />
         <SeccionEmpresas />
-        <SeccionStats stats={stats} />
-        <SeccionPasos />
+        <SeccionJourney />
         <SeccionReferidos />
         <SeccionParaEmpresas />
         <SeccionDashboard />

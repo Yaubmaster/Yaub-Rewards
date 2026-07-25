@@ -100,10 +100,15 @@
   position: relative;
   z-index: 1;
 }
+/* `.wrap` SOLO controla el ancho y el padding horizontal. El vertical lo ponen
+   `section` / `.hero` / `.final` con longhand: si aquí se usara el shorthand
+   `padding`, ganaría por especificidad (2 clases) y dejaría las secciones sin
+   aire — que es justo lo que pasaba. */
 .lp .wrap {
   max-width: 1120px;
   margin: 0 auto;
-  padding: 0 22px;
+  padding-left: 22px;
+  padding-right: 22px;
 }
 .lp [data-r] {
   opacity: 0;
@@ -192,7 +197,8 @@
 
 /* hero */
 .lp .hero {
-  padding: clamp(40px, 6vh, 72px) 0 clamp(30px, 5vh, 52px);
+  padding-top: clamp(44px, 6vh, 76px);
+  padding-bottom: clamp(36px, 5vh, 56px);
 }
 .lp .hero-grid {
   display: grid;
@@ -453,7 +459,8 @@
 
 /* sections */
 .lp section {
-  padding: clamp(38px, 5.5vh, 64px) 0;
+  padding-top: clamp(46px, 6vh, 72px);
+  padding-bottom: clamp(46px, 6vh, 72px);
 }
 .lp .kicker {
   font-size: 12.5px;
@@ -575,6 +582,230 @@
   color: var(--ink-2);
   margin-top: 9px;
   line-height: 1.4;
+}
+
+/* customer journey (dos targets) */
+.lp .jgrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: clamp(18px, 2.4vw, 28px);
+  margin-top: 40px;
+}
+.lp .jcol {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 24px;
+  padding: clamp(22px, 2.4vw, 30px);
+  box-shadow: 0 14px 36px rgba(20, 20, 31, 0.05);
+  position: relative;
+  overflow: hidden;
+}
+.lp .jcol::after {
+  content: '';
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 3px;
+  background: var(--jgrad);
+}
+.lp .jcol--vendedor {
+  --jgrad: linear-gradient(90deg, #65a30d, #a3e635);
+  --jtint: rgba(132, 204, 22, 0.12);
+  --jink: #4d7c0f;
+}
+.lp .jcol--empresa {
+  --jgrad: linear-gradient(90deg, var(--cyan), var(--violet));
+  --jtint: rgba(8, 145, 178, 0.1);
+  --jink: #0e7490;
+}
+.lp .jhead {
+  margin-bottom: 22px;
+}
+.lp .jbadge {
+  display: inline-block;
+  font-size: 11.5px;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: var(--jtint);
+  color: var(--jink);
+}
+.lp .jhead h3 {
+  font-size: clamp(21px, 2.2vw, 26px);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  margin-top: 10px;
+}
+.lp .jsteps {
+  list-style: none;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+/* riel + relleno progresivo detrás de los nodos */
+.lp .jline {
+  position: absolute;
+  left: 21px;
+  top: 8px;
+  bottom: 26px;
+  width: 2px;
+  background: rgba(20, 20, 31, 0.09);
+  border-radius: 2px;
+}
+.lp .jline-fill {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: 2px;
+  background: var(--jgrad);
+  transform: scaleY(0);
+  transform-origin: top;
+  transition: transform 1.9s var(--ease) 0.25s;
+}
+.lp .in .jline-fill {
+  transform: scaleY(1);
+}
+.lp .jstep {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  position: relative;
+  opacity: 0;
+  transform: translateY(12px);
+}
+.lp .in .jstep {
+  animation: lpJStep 0.5s var(--ease) forwards;
+  animation-delay: calc(var(--i) * 0.34s + 0.25s);
+}
+@keyframes lpJStep {
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.lp .jnode {
+  width: 44px;
+  height: 44px;
+  flex: none;
+  border-radius: 50%;
+  background: #fff;
+  border: 2px solid var(--line);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 19px;
+  line-height: 1;
+  z-index: 1;
+}
+.lp .in .jstep .jnode {
+  animation: lpJNode 0.6s var(--ease) forwards;
+  animation-delay: calc(var(--i) * 0.34s + 0.3s);
+}
+@keyframes lpJNode {
+  0% {
+    box-shadow: 0 0 0 0 var(--jtint);
+  }
+  60% {
+    box-shadow: 0 0 0 12px transparent;
+  }
+  100% {
+    box-shadow: 0 6px 16px rgba(20, 20, 31, 0.08);
+  }
+}
+.lp .jtexto {
+  padding-top: 3px;
+  /* espacio reservado para el dato, anclado a la derecha del paso */
+  padding-right: 104px;
+  min-width: 0;
+  flex: 1;
+}
+.lp .jtexto b {
+  display: block;
+  font-size: 15.5px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  line-height: 1.3;
+}
+.lp .jtexto small {
+  display: block;
+  font-size: 13px;
+  color: var(--ink-2);
+  line-height: 1.45;
+  margin-top: 3px;
+}
+.lp .jdato {
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 12px;
+  font-weight: 800;
+  padding: 5px 11px;
+  border-radius: 999px;
+  background: var(--jtint);
+  color: var(--jink);
+  white-space: nowrap;
+}
+@media (max-width: 700px) {
+  /* el dato pasa a una línea propia bajo el texto: anclado a la derecha
+     partía los títulos en dos renglones en pantallas angostas */
+  .lp .jtexto {
+    padding-right: 0;
+  }
+  .lp .jdato {
+    position: static;
+    transform: none;
+    display: inline-block;
+    margin-top: 9px;
+  }
+}
+.lp .jpayoff {
+  margin-top: 24px;
+  padding: 20px;
+  border-radius: 18px;
+  background: var(--jtint);
+  border: 1px solid color-mix(in srgb, var(--jink) 28%, transparent);
+  text-align: center;
+  opacity: 0;
+  transform: translateY(14px) scale(0.97);
+}
+.lp .in .jpayoff {
+  animation: lpJPayoff 0.65s var(--ease) 1.95s forwards;
+}
+@keyframes lpJPayoff {
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.lp .jpayoff-n {
+  font-size: clamp(36px, 4.4vw, 52px);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  line-height: 1;
+  color: var(--jink);
+  font-variant-numeric: tabular-nums;
+}
+.lp .jpayoff-n em {
+  font-style: normal;
+  font-size: 0.42em;
+  font-weight: 700;
+  margin-left: 6px;
+  color: var(--ink-2);
+}
+.lp .jpayoff-t {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--ink);
+  margin-top: 8px;
+  line-height: 1.4;
+}
+.lp .jpayoff-nota {
+  font-size: 11.5px;
+  color: var(--ink-3);
+  margin-top: 6px;
 }
 
 /* steps */
@@ -982,7 +1213,8 @@
 /* final cta */
 .lp .final {
   text-align: center;
-  padding: clamp(48px, 7vh, 84px) 0;
+  padding-top: clamp(56px, 7vh, 92px);
+  padding-bottom: clamp(56px, 7vh, 92px);
 }
 .lp .final h2 {
   font-size: clamp(34px, 4.6vw, 60px);
@@ -1033,6 +1265,10 @@
     grid-template-columns: 1fr 1fr;
     gap: 12px;
   }
+  .lp .jgrid {
+    grid-template-columns: 1fr;
+    margin-top: 30px;
+  }
   .lp .steps3 {
     grid-template-columns: 1fr;
     gap: 12px;
@@ -1049,7 +1285,8 @@
 }
 @media (max-width: 560px) {
   .lp .wrap {
-    padding: 0 16px;
+    padding-left: 16px;
+    padding-right: 16px;
   }
   /* el logo solo identifica la marca: el wordmark cede espacio a los 2 CTAs */
   .lp .navin {
@@ -1065,10 +1302,16 @@
     padding: 9px 14px;
   }
   .lp section {
-    padding: 30px 0;
+    padding-top: 44px;
+    padding-bottom: 44px;
   }
   .lp .hero {
-    padding: 28px 0 24px;
+    padding-top: 30px;
+    padding-bottom: 30px;
+  }
+  .lp .final {
+    padding-top: 52px;
+    padding-bottom: 52px;
   }
   .lp .hero h1 {
     font-size: 40px;
@@ -1153,11 +1396,16 @@
   }
   .lp [data-r],
   .lp .msg,
-  .lp .notif {
+  .lp .notif,
+  .lp .jstep,
+  .lp .jpayoff {
     opacity: 1;
     transform: none;
   }
   .lp .in .track .fill {
     width: 66%;
+  }
+  .lp .jline-fill {
+    transform: scaleY(1);
   }
 }

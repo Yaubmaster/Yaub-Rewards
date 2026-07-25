@@ -1,7 +1,6 @@
 import type { Metadata } from 'next';
 import { redirect } from 'next/navigation';
 import { supabaseServer } from '@/lib/supabase/server';
-import { obtenerStatsLanding } from '@/lib/statsLanding';
 import { LandingPage } from '@/components/landing/LandingPage';
 import './landing.css';
 
@@ -35,6 +34,5 @@ export default async function Bienvenida() {
     redirect('/registro/finalizar');
   }
 
-  const stats = await obtenerStatsLanding(supabase);
-  return <LandingPage stats={stats} />;
+  return <LandingPage />;
 }
