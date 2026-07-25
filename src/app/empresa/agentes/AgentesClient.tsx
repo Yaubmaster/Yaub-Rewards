@@ -92,7 +92,7 @@ export function AgentesClient() {
           </p>
         </div>
         <Link href="/empresa/agentes/nuevo" className="btn-gradient px-4 py-2.5 text-sm">
-          Crear agente nuevo
+          Crear empresa/agente
         </Link>
       </div>
 
