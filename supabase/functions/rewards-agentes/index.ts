@@ -216,7 +216,7 @@ Deno.serve(async (req) => {
         const tenantId = await ensureTenant();
         const { data: agentes, error } = await svc
           .from("assistants")
-          .select("id, name, slug, is_active, created_at, avatar_url, widget_public_key, widget_config, source, archived_at")
+          .select("id, name, slug, is_active, created_at, avatar_url, widget_public_key, widget_config, source, archived_at, tools")
           .eq("tenant_id", tenantId)
           .is("archived_at", null)
           .order("created_at", { ascending: false });
@@ -227,10 +227,23 @@ Deno.serve(async (req) => {
           .select("assistant_id, trial_started_at, trial_ends_at, paused_at, activated_at")
           .eq("empresa_id", empresaId);
         const porAgente = new Map((trials ?? []).map((t) => [t.assistant_id, t]));
+
+        // Solo los agentes CONECTADOS a Yaub Rewards, no todos los del tenant:
+        // los creados desde esta consola (tienen trial) o los que ya traen la
+        // herramienta de Rewards cableada en la plataforma.
+        const conectados = (agentes ?? []).filter(
+          (a) =>
+            porAgente.has(a.id) ||
+            JSON.stringify(a.tools ?? []).toLowerCase().includes("rewards"),
+        );
+
         return json({
           ok: true,
           tenant_id: tenantId,
-          agentes: (agentes ?? []).map((a) => ({ ...a, trial: porAgente.get(a.id) ?? null })),
+          agentes: conectados.map(({ tools: _tools, ...a }) => ({
+            ...a,
+            trial: porAgente.get(a.id) ?? null,
+          })),
         });
       }
 

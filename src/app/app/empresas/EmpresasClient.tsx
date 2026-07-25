@@ -85,7 +85,7 @@ export function EmpresasClient({
               key={e.id}
               className="relative flex flex-col overflow-hidden rounded-[20px] border bg-white transition-all hover:-translate-y-0.5"
               style={{
-                borderColor: destacada ? 'rgba(139,92,246,.45)' : '#E2E8F0',
+                borderColor: destacada ? 'rgba(139,92,246,.45)' : 'rgb(var(--linea))',
                 boxShadow: destacada
                   ? '0 10px 30px rgba(139,92,246,.12)'
                   : '0 2px 8px rgba(10,10,15,.04)',
@@ -106,7 +106,7 @@ export function EmpresasClient({
                     className="flex h-[42px] w-[42px] shrink-0 items-center justify-center rounded-[12px] text-base font-extrabold"
                     style={
                       destacada
-                        ? { background: '#0A0A0F', color: '#fff' }
+                        ? { background: 'rgb(var(--tinta))', color: 'rgb(var(--card))' }
                         : { background: 'rgba(14,165,233,.12)', color: '#0EA5E9' }
                     }
                   >
@@ -163,10 +163,10 @@ export function EmpresasClient({
                   className="mt-3.5 w-full rounded-[13px] border py-3 text-center text-sm font-bold transition-all active:scale-[.98] disabled:opacity-60"
                   style={
                     on
-                      ? { background: '#fff', color: '#10B981', borderColor: 'rgba(16,185,129,.4)' }
+                      ? { background: 'rgb(var(--card))', color: '#10B981', borderColor: 'rgba(16,185,129,.4)' }
                       : {
                           background: 'linear-gradient(135deg,#00D4FF,#8B5CF6)',
-                          color: '#fff',
+                          color: 'rgb(var(--card))',
                           borderColor: 'transparent',
                         }
                   }

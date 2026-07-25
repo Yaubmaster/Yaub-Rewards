@@ -157,10 +157,10 @@ export function ReferidosCard({
               style={
                 logrado
                   ? { background: 'rgba(139,92,246,.1)', borderColor: 'rgba(139,92,246,.35)', color: '#7C3AED' }
-                  : { background: '#F8FAFC', borderColor: '#E2E8F0', color: '#94A3B8' }
+                  : { background: 'rgb(var(--superficie))', borderColor: 'rgb(var(--linea))', color: 'rgb(var(--tinta3))' }
               }
             >
-              <Icon d={ICON_PATHS.medal} size={13} strokeWidth={2.2} stroke={logrado ? '#7C3AED' : '#94A3B8'} />
+              <Icon d={ICON_PATHS.medal} size={13} strokeWidth={2.2} stroke={logrado ? '#7C3AED' : 'rgb(var(--tinta3))'} />
               {h.label}
             </div>
           );

@@ -117,13 +117,13 @@ export function PasoEmpresas({ freelancerId }: { freelancerId: string }) {
               key={e.id}
               onClick={() => setSeleccion((s) => ({ ...s, [e.id]: !s[e.id] }))}
               className="flex items-center gap-3.5 rounded-2xl border bg-white p-4 text-left transition-all"
-              style={{ borderColor: on ? '#00D4FF' : '#E2E8F0' }}
+              style={{ borderColor: on ? '#00D4FF' : 'rgb(var(--linea))' }}
             >
               <div
                 className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[11px] text-[15px] font-extrabold"
                 style={
                   e.nombre === 'Yaub Móvil'
-                    ? { background: '#0A0A0F', color: '#fff' }
+                    ? { background: 'rgb(var(--tinta))', color: 'rgb(var(--card))' }
                     : { background: 'rgba(14,165,233,.12)', color: '#0EA5E9' }
                 }
               >
@@ -139,7 +139,7 @@ export function PasoEmpresas({ freelancerId }: { freelancerId: string }) {
                 className="flex h-6 w-6 shrink-0 items-center justify-center rounded-lg border-2 transition-all"
                 style={{
                   borderColor: on ? 'transparent' : '#CBD5E1',
-                  background: on ? 'linear-gradient(135deg,#00D4FF,#8B5CF6)' : '#fff',
+                  background: on ? 'linear-gradient(135deg,#00D4FF,#8B5CF6)' : 'rgb(var(--card))',
                 }}
               >
                 {on && <Icon d={ICON_PATHS.check} size={14} stroke="#fff" strokeWidth={3.4} />}

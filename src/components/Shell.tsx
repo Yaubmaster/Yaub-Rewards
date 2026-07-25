@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { supabaseBrowser } from '@/lib/supabase/client';
 import { Icon, ICON_PATHS } from '@/components/icons';
+import { TemaToggle } from '@/components/TemaToggle';
 
 export interface NavItem {
   href: string;
@@ -40,7 +41,7 @@ export function Shell({
       {/* Sidebar desktop */}
       <div className="fixed bottom-0 left-0 top-0 z-20 hidden w-60 flex-col border-r border-line bg-white px-3.5 py-6 md:flex">
         <div className="flex items-center gap-2.5 px-2.5 pb-[22px]">
-          <img src="/rewards/yaub-icon.png" alt="Yaub" className="h-8 w-auto" />
+          <img src="/rewards/yaub-icon.png" alt="Yaub" className="logo-yaub h-8 w-auto" />
           <div>
             <div className="text-[15px] font-extrabold tracking-tight">Yaub Rewards</div>
             <div className="text-[11px] text-slate3">{roleLabel}</div>
@@ -55,10 +56,10 @@ export function Shell({
                 href={it.href}
                 className={`flex items-center gap-3 rounded-xl px-3 py-[11px] transition-colors hover:bg-surface ${on ? 'bg-surface' : ''}`}
               >
-                <Icon d={ICON_PATHS[it.icon]} stroke={on ? '#0A0A0F' : '#94A3B8'} />
+                <Icon d={ICON_PATHS[it.icon]} stroke={on ? 'rgb(var(--tinta))' : 'rgb(var(--tinta3))'} />
                 <span
                   className="text-sm"
-                  style={{ fontWeight: on ? 700 : 500, color: on ? '#0A0A0F' : '#94A3B8' }}
+                  style={{ fontWeight: on ? 700 : 500, color: on ? 'rgb(var(--tinta))' : 'rgb(var(--tinta3))' }}
                 >
                   {it.label}
                 </span>
@@ -67,6 +68,9 @@ export function Shell({
           })}
         </nav>
         <div className="mt-auto">
+          <div className="mb-1 border-t border-line pt-2">
+            <TemaToggle variante="fila" />
+          </div>
           {switchTo && (
             <Link
               href={switchTo.href}
@@ -77,7 +81,7 @@ export function Shell({
           )}
           <button
             onClick={logout}
-            className="flex w-full items-center gap-2.5 rounded-xl px-3 py-[11px] transition-colors hover:bg-red-50"
+            className="flex w-full items-center gap-2.5 rounded-xl px-3 py-[11px] transition-colors hover:bg-[rgba(239,68,68,.1)]"
           >
             <Icon d={ICON_PATHS.logout} size={18} stroke="#EF4444" />
             <span className="text-[13px] font-semibold text-red-500">Cerrar sesión</span>
@@ -91,22 +95,23 @@ export function Shell({
         {/* Header + nav móvil (sticky arriba) */}
         <div
           className="sticky top-0 z-30 border-b border-line md:hidden"
-          style={{ background: 'rgba(255,255,255,.92)', backdropFilter: 'blur(16px)' }}
+          style={{ background: 'rgb(var(--card) / .92)', backdropFilter: 'blur(16px)' }}
         >
           <div className="flex items-center justify-between gap-2.5 px-4 pb-1.5 pt-3">
             <div className="flex items-center gap-[9px]">
-              <img src="/rewards/yaub-icon.png" alt="Yaub" className="h-[26px] w-auto" />
-              <span className="text-[15px] font-extrabold tracking-tight">Yaub Rewards</span>
+              <img src="/rewards/yaub-icon.png" alt="Yaub" className="logo-yaub h-[26px] w-auto" />
+              <span className="whitespace-nowrap text-[15px] font-extrabold tracking-tight">Yaub Rewards</span>
             </div>
             <div className="flex items-center gap-2">
               {switchTo && (
                 <Link
                   href={switchTo.href}
-                  className="rounded-[11px] border border-line bg-surface px-2.5 py-[7px] text-[11px] font-semibold text-slate2"
+                  className="whitespace-nowrap rounded-[11px] border border-line bg-surface px-2.5 py-[7px] text-[11px] font-semibold text-slate2"
                 >
-                  {switchTo.label}
+                  {switchTo.label.replace(/^Cambiar a /, '')}
                 </Link>
               )}
+              <TemaToggle />
               <button
                 onClick={logout}
                 className="flex h-[34px] w-[34px] shrink-0 items-center justify-center rounded-[11px] border border-line bg-white transition-colors hover:border-red-400"
@@ -129,11 +134,11 @@ export function Shell({
                     d={ICON_PATHS[it.icon]}
                     size={21}
                     strokeWidth={1.9}
-                    stroke={on ? '#0A0A0F' : '#94A3B8'}
+                    stroke={on ? 'rgb(var(--tinta))' : 'rgb(var(--tinta3))'}
                   />
                   <span
                     className="text-[10px]"
-                    style={{ fontWeight: on ? 700 : 500, color: on ? '#0A0A0F' : '#94A3B8' }}
+                    style={{ fontWeight: on ? 700 : 500, color: on ? 'rgb(var(--tinta))' : 'rgb(var(--tinta3))' }}
                   >
                     {it.label}
                   </span>

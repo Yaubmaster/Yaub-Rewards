@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { supabaseBrowser } from '@/lib/supabase/client';
 import { useCopiar } from '@/components/CodigoBadge';
 import { Icon, ICON_PATHS } from '@/components/icons';
+import { TemaToggle } from '@/components/TemaToggle';
 import { fechaLarga, iniciales, mxn } from '@/lib/format';
 import type { Freelancer, Pago } from '@/lib/types';
 
@@ -143,6 +144,17 @@ export function PerfilClient({
             Agrega tu CLABE para recibir tus depósitos de comisiones.
           </div>
         )}
+      </div>
+
+      {/* Apariencia */}
+      <div className="mt-3.5 rounded-[18px] border border-line bg-white p-5">
+        <div className="mb-1 text-[15px] font-bold">Apariencia</div>
+        <div className="mb-1 text-[13px] text-slate2">
+          Elige cómo se ve Yaub Rewards en este dispositivo.
+        </div>
+        <div className="-mx-3 mt-1">
+          <TemaToggle variante="fila" />
+        </div>
       </div>
 
       {/* Segunda oficina: perfil de empresa */}

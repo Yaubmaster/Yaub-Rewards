@@ -100,8 +100,8 @@ export function AdminClient({
               className="rounded-full border px-[15px] py-2 text-[13px] font-semibold transition-all"
               style={
                 tab === t.k
-                  ? { background: '#0A0A0F', color: '#fff', borderColor: '#0A0A0F' }
-                  : { background: '#fff', color: '#475569', borderColor: '#E2E8F0' }
+                  ? { background: 'rgb(var(--tinta))', color: 'rgb(var(--card))', borderColor: 'rgb(var(--tinta))' }
+                  : { background: 'rgb(var(--card))', color: 'rgb(var(--tinta2))', borderColor: 'rgb(var(--linea))' }
               }
             >
               {t.label}
@@ -122,7 +122,7 @@ export function AdminClient({
                   className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[11px] text-[15px] font-extrabold"
                   style={
                     e.estado === 'autorizada'
-                      ? { background: '#0A0A0F', color: '#fff' }
+                      ? { background: 'rgb(var(--tinta))', color: 'rgb(var(--card))' }
                       : { background: 'rgba(245,158,11,.14)', color: '#F59E0B' }
                   }
                 >

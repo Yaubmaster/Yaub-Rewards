@@ -52,7 +52,8 @@ export function AgentesClient({ empresaId }: { empresaId: string }) {
         <div>
           <h1 className="text-[22px] font-extrabold tracking-tight">Agentes Yaub Conectados</h1>
           <p className="mt-0.5 text-[13px] text-slate2">
-            Asistentes de IA de tu negocio — la misma cuenta funciona en platform.yaub.ai
+            Los agentes de tu negocio conectados a Rewards — la misma cuenta funciona en
+            platform.yaub.ai
           </p>
         </div>
         <Link

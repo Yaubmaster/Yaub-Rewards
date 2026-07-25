@@ -28,6 +28,8 @@ export const ICON_PATHS = {
   external: 'M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6 M15 3h6v6 M10 14 21 3',
   trash: 'M3 6h18 M8 6V4h8v2 M6 6l1 14h10l1-14 M10 11v6 M14 11v6',
   plus: 'M12 5v14 M5 12h14',
+  sun: 'M12 17a5 5 0 1 0 0-10 5 5 0 0 0 0 10z M12 1.5v2 M12 20.5v2 M4.2 4.2l1.4 1.4 M18.4 18.4l1.4 1.4 M1.5 12h2 M20.5 12h2 M4.2 19.8l1.4-1.4 M18.4 5.6l1.4-1.4',
+  moon: 'M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z',
 } as const;
 
 export function Icon({

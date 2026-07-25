@@ -135,8 +135,8 @@ export default function RegistroEmpresa({
       className="rounded-full border px-4 py-[9px] text-[13px] font-semibold transition-all"
       style={
         capacitacion === tipo
-          ? { background: '#0A0A0F', color: '#fff', borderColor: '#0A0A0F' }
-          : { background: '#fff', color: '#475569', borderColor: '#E2E8F0' }
+          ? { background: 'rgb(var(--tinta))', color: 'rgb(var(--card))', borderColor: 'rgb(var(--tinta))' }
+          : { background: 'rgb(var(--card))', color: 'rgb(var(--tinta2))', borderColor: 'rgb(var(--linea))' }
       }
     >
       {label}

@@ -18,12 +18,20 @@ export const metadata: Metadata = {
 export const viewport: Viewport = {
   width: 'device-width',
   initialScale: 1,
-  themeColor: '#ffffff',
 };
+
+// Aplica el tema antes del primer pintado para que no haya destello en blanco
+// al entrar en modo oscuro. Si no hay preferencia guardada, sigue al sistema.
+const TEMA_INICIAL = `try{var t=localStorage.getItem('rewards_tema');
+if(t==='dark'||(!t&&window.matchMedia('(prefers-color-scheme:dark)').matches)){document.documentElement.dataset.tema='dark';}
+}catch(e){}`;
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="es-MX" className={inter.variable}>
+    <html lang="es-MX" className={inter.variable} suppressHydrationWarning>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: TEMA_INICIAL }} />
+      </head>
       <body className="font-sans">{children}</body>
     </html>
   );
