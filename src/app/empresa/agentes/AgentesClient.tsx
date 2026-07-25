@@ -12,8 +12,8 @@ import { INTERACCIONES_TRIAL, PLAN_MENSUAL, type AgenteDeCuenta } from '@/lib/ag
 function Estado({ a }: { a: AgenteDeCuenta }) {
   const restantes = Math.max(0, a.interacciones_incluidas - a.interacciones_usadas);
   let txt: string, bg: string, fg: string;
-  if (!a.activado) {
-    txt = 'Sin activar';
+  if (!a.rewards_activo) {
+    txt = 'Sin Rewards';
     bg = 'rgba(148,163,184,.16)';
     fg = '#64748B';
   } else if (a.con_plan) {
@@ -61,19 +61,24 @@ export function AgentesClient() {
   const activar = async (assistantId: string) => {
     setActivando(assistantId);
     const supabase = supabaseBrowser();
-    const { error: e } = await supabase.rpc('activar_agente_en_rewards', {
+    const { error: e } = await supabase.rpc('activar_rewards_en_agente', {
       p_assistant_id: assistantId,
     });
     setActivando(null);
     if (e) {
-      setError('No se pudo activar ese agente.');
+      // La RLS de la plataforma solo deja editar agentes a dueños de la cuenta
+      setError(
+        e.message?.includes('permiso')
+          ? 'Solo el dueño de la cuenta Yaub puede activar Rewards en este agente.'
+          : 'No se pudo activar ese agente.',
+      );
       return;
     }
     await cargar();
   };
 
-  const activados = (agentes ?? []).filter((a) => a.activado);
-  const disponibles = (agentes ?? []).filter((a) => !a.activado);
+  const activados = (agentes ?? []).filter((a) => a.rewards_activo);
+  const disponibles = (agentes ?? []).filter((a) => !a.rewards_activo);
 
   return (
     <div className="animate-fadeUpFast">
@@ -81,8 +86,9 @@ export function AgentesClient() {
         <div>
           <h1 className="text-[22px] font-extrabold tracking-tight">Agentes Yaub Conectados</h1>
           <p className="mt-0.5 text-[13px] text-slate2">
-            Cada agente de tu cuenta es una empresa aquí. Activa el que quieras que venda con la
-            red — {INTERACCIONES_TRIAL} interacciones gratis y luego {PLAN_MENSUAL}.
+            Cada agente de tu cuenta es una empresa aquí: los vendedores se suscriben al agente.
+            Actívale Rewards al que quieras que venda — {INTERACCIONES_TRIAL} interacciones gratis
+            y luego {PLAN_MENSUAL}.
           </p>
         </div>
         <Link href="/empresa/agentes/nuevo" className="btn-gradient px-4 py-2.5 text-sm">
@@ -148,10 +154,10 @@ export function AgentesClient() {
       {disponibles.length > 0 && (
         <>
           <div className="mt-7 text-[13px] font-bold text-slate3">
-            TUS OTROS AGENTES EN YAUB ({disponibles.length})
+            TUS OTROS AGENTES ({disponibles.length})
           </div>
           <p className="mt-0.5 text-[12.5px] text-slate2">
-            Actívalos aquí para ponerles comisión y que los vendedores los promuevan.
+            Al activarlos les cableamos la skill de Rewards (registrar y validar códigos) para que los vendedores puedan referirles clientes.
           </p>
           <div className="mt-2 flex flex-col gap-2.5">
             {disponibles.map((a) => (
@@ -168,7 +174,7 @@ export function AgentesClient() {
                   disabled={activando === a.assistant_id}
                   className="shrink-0 whitespace-nowrap rounded-xl border border-line bg-white px-3.5 py-2 text-[12.5px] font-bold text-slate2 transition-colors hover:border-cyan1 hover:text-[#0284C7] disabled:opacity-50"
                 >
-                  {activando === a.assistant_id ? 'Activando…' : 'Activar'}
+                  {activando === a.assistant_id ? 'Activando…' : 'Activar Rewards'}
                 </button>
               </div>
             ))}

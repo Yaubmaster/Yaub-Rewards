@@ -18,12 +18,12 @@ export interface AgenteDeCuenta {
   tenant: string;
   activo: boolean;
   widget_key: string | null;
-  activado: boolean;
+  /** Tiene cableada la skill de Rewards (registrar_referido / validar_codigo) */
+  rewards_activo: boolean;
   empresa_id: string | null;
   ofertas: number;
   interacciones_incluidas: number;
   interacciones_usadas: number;
-  en_trial: boolean;
   con_plan: boolean;
 }
 
