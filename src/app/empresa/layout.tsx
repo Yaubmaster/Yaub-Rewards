@@ -1,3 +1,4 @@
+import { Fragment } from 'react';
 import { redirect } from 'next/navigation';
 import { Shell, type NavItem } from '@/components/Shell';
 import { supabaseServer } from '@/lib/supabase/server';
@@ -51,7 +52,13 @@ export default async function EmpresaLayout({ children }: { children: React.Reac
           freelancers.
         </div>
       )}
-      {children}
+      {/* La `key` es a propósito: al cambiar de empresa, `router.refresh()`
+          vuelve a pedir los datos al servidor, pero React conserva el estado de
+          los componentes cliente que están en la misma posición del árbol —
+          y esas pantallas guardan los datos del servidor en useState. Sin la
+          key se quedaban los referidos y las ofertas de la empresa anterior.
+          Cambiar la key desmonta el subárbol y arranca de cero. */}
+      <Fragment key={empresa?.id ?? 'sin-empresa'}>{children}</Fragment>
     </Shell>
   );
 }

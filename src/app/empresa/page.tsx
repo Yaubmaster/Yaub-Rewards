@@ -1,7 +1,7 @@
 import { redirect } from 'next/navigation';
 import { supabaseServer } from '@/lib/supabase/server';
 import { empresaActiva } from '@/lib/empresa';
-import { DashboardClient, type ReferidoEmpresa, type TopVendedor } from './DashboardClient';
+import { DashboardClient, type ReferidoEmpresa } from './DashboardClient';
 
 export const dynamic = 'force-dynamic';
 
@@ -35,29 +35,12 @@ export default async function EmpresaDashboard() {
       .eq('empresa_id', empresa.id),
   ]);
 
-  const lista = (referidos ?? []) as unknown as ReferidoEmpresa[];
-
-  const porVendedor = new Map<string, TopVendedor>();
-  lista.forEach((r) => {
-    const key = r.codigo;
-    const cur = porVendedor.get(key) ?? {
-      nombre: r.freelancers?.nombre ?? key,
-      codigo: key,
-      ventas: 0,
-    };
-    cur.ventas += 1;
-    porVendedor.set(key, cur);
-  });
-  const top = Array.from(porVendedor.values())
-    .sort((a, b) => b.ventas - a.ventas)
-    .slice(0, 5);
-
+  // El ranking lo arma el cliente: depende del periodo que elija la empresa.
   return (
     <DashboardClient
       empresaNombre={empresa.nombre}
       ofertaIds={ofertaIds}
-      referidosIniciales={lista}
-      topVendedores={top}
+      referidosIniciales={(referidos ?? []) as unknown as ReferidoEmpresa[]}
       nSuscritos={nSuscritos ?? 0}
     />
   );
