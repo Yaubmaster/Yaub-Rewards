@@ -6,7 +6,7 @@ import { EmpresaSelector } from './EmpresaSelector';
 
 const NAV: NavItem[] = [
   { href: '/empresa', label: 'Dashboard', icon: 'grid' },
-  { href: '/empresa/agentes', label: 'Agentes Yaub', icon: 'bot' },
+  { href: '/empresa/agentes', label: 'Agentes', icon: 'bot' },
   { href: '/empresa/oferta', label: 'Mi oferta', icon: 'tag' },
   { href: '/empresa/freelancers', label: 'Freelancers', icon: 'users' },
   { href: '/empresa/referidos', label: 'Referidos', icon: 'list' },

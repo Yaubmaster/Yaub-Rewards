@@ -13,20 +13,23 @@ export function SeccionPasos() {
         <div className="step3" data-r="" style={r(0)}>
           <span className="num">1</span>
           <h3>Regístrate gratis</h3>
-          <p>Crea tu cuenta en un minuto y obtén tu link y código de vendedor únicos.</p>
+          <p>Crea tu cuenta en un minuto y recibe tu código de vendedor único.</p>
         </div>
         <div className="step3" data-r="" style={r(1)}>
           <span className="num">2</span>
-          <h3>Comparte con quien sea</h3>
+          <h3>Comparte tu código</h3>
           <p>
-            Amigos, redes, tu cartera de clientes. Tu link lleva a cada persona directo con el
-            agente.
+            Amigos, redes, tu cartera de clientes. Solo diles que den tu código cuando el agente
+            les pregunte quién los refirió.
           </p>
         </div>
         <div className="step3" data-r="" style={r(2)}>
           <span className="num">3</span>
           <h3>La IA cierra, tú cobras</h3>
-          <p>El agente atiende, cotiza, cierra y cobra. Tu comisión aparece en tu dashboard.</p>
+          <p>
+            El agente atiende, cotiza, cierra y cobra. Registra tu código solo y vigila la
+            condición hasta liberar tu comisión.
+          </p>
         </div>
       </div>
       <p className="remate" data-r="">

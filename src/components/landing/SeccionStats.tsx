@@ -23,7 +23,7 @@ export function SeccionStats({ stats }: { stats: StatsLanding }) {
             <span data-n={stats.vendedoresActivos} data-grp="1">0</span>
             {stats.vendedoresActivos > 0 && '+'}
           </div>
-          <p>vendedores activos ganando con su link</p>
+          <p>vendedores activos ganando con su código</p>
         </div>
         <div className="stat" data-r="" style={r(2)}>
           <div className="n">

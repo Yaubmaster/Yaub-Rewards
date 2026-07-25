@@ -4,12 +4,16 @@ const PREGUNTAS = [
     a: 'Nada, nunca. Es gratis para vendedores y gratis para las empresas que publican. La única condición para las empresas es que la venta pase por los agentes de IA de Yaub.',
   },
   {
+    q: '¿Cómo sabe el agente que ese cliente es mío?',
+    a: 'Porque el cliente le da tu código. Al cerrar la venta, el agente pregunta quién lo refirió o cómo se enteró; tu cliente responde con tu código y el agente lo registra solo. Ni tú ni él llenan nada.',
+  },
+  {
     q: '¿Cómo y cuándo cobro mis comisiones?',
-    a: 'Cada venta cerrada por el agente genera una comisión que ves en tu dashboard. Ahí mismo la retiras cuando se libera — sin mínimos escondidos.',
+    a: 'En cuanto el cliente da tu código, el agente registra tu comisión y la deja pendiente. Él mismo vigila la condición de liberación —por ejemplo, la primera recarga— y la libera sin que tú muevas un dedo. La ves en tu dashboard y la retiras cuando queda liberada, sin mínimos escondidos.',
   },
   {
     q: '¿Necesito saber vender?',
-    a: 'No. Tú solo compartes tu link. El agente de IA cotiza, responde dudas, cierra la venta y cobra. Por eso decimos: tú refieres, la IA vende.',
+    a: 'No. Tú solo compartes tu código. El agente de IA cotiza, responde dudas, cierra la venta y cobra. Por eso decimos: tú refieres, la IA vende.',
   },
   {
     q: '¿Qué empresas puedo referir?',

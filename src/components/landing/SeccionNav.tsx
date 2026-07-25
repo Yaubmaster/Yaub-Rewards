@@ -9,9 +9,14 @@ export function SeccionNav() {
         <span className="wm">
           Yaub <em>Rewards</em>
         </span>
-        <Link className="nav-cta" href="/registro">
-          Comenzar gratis
-        </Link>
+        <div className="nav-acciones">
+          <Link className="nav-login" href="/login">
+            Ya tengo cuenta
+          </Link>
+          <Link className="nav-cta" href="/registro">
+            Comenzar gratis
+          </Link>
+        </div>
       </div>
     </nav>
   );

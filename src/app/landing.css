@@ -149,14 +149,37 @@
   font-style: normal;
   color: var(--cyan);
 }
-.lp .nav-cta {
+.lp .nav-acciones {
   margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.lp .nav-login {
+  font-weight: 700;
+  font-size: 14px;
+  padding: 10px 16px;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  background: #fff;
+  color: var(--ink-2);
+  white-space: nowrap;
+  transition:
+    border-color 0.3s var(--ease),
+    color 0.3s var(--ease);
+}
+.lp .nav-login:hover {
+  border-color: rgba(8, 145, 178, 0.45);
+  color: var(--cyan);
+}
+.lp .nav-cta {
   font-weight: 700;
   font-size: 14px;
   padding: 10px 20px;
   border-radius: 999px;
   background: linear-gradient(120deg, var(--cyan), #22d3ee);
   color: #fff;
+  white-space: nowrap;
   transition:
     transform 0.3s var(--ease),
     box-shadow 0.3s;
@@ -381,6 +404,12 @@
 .lp .in .msg:nth-child(4) {
   animation-delay: 2.1s;
 }
+.lp .in .msg:nth-child(5) {
+  animation-delay: 2.7s;
+}
+.lp .in .msg:nth-child(6) {
+  animation-delay: 3.3s;
+}
 .lp .notif {
   position: absolute;
   left: -26px;
@@ -399,7 +428,7 @@
   transform: translateY(16px);
 }
 .lp .in .notif {
-  animation: lpMsgIn 0.6s var(--ease) 2.8s forwards;
+  animation: lpMsgIn 0.6s var(--ease) 4.1s forwards;
 }
 .lp .notif .ic {
   width: 38px;
@@ -1022,6 +1051,19 @@
   .lp .wrap {
     padding: 0 16px;
   }
+  /* el logo solo identifica la marca: el wordmark cede espacio a los 2 CTAs */
+  .lp .navin {
+    padding: 11px 16px;
+    gap: 8px;
+  }
+  .lp .navin .wm {
+    display: none;
+  }
+  .lp .nav-login,
+  .lp .nav-cta {
+    font-size: 13px;
+    padding: 9px 14px;
+  }
   .lp section {
     padding: 30px 0;
   }
@@ -1075,7 +1117,7 @@
     transform: none;
   }
   .lp .in .notif {
-    animation: lpMsgIn 0.6s var(--ease) 2.8s forwards;
+    animation: lpMsgIn 0.6s var(--ease) 4.1s forwards;
   }
   .lp .badges {
     flex-wrap: wrap;

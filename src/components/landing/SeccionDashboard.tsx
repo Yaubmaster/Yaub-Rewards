@@ -12,7 +12,7 @@ export function SeccionDashboard() {
         Plataforma real, <span style={{ color: 'var(--lime)' }}>dinero real.</span>
       </h2>
       <p className="lead" data-r="">
-        Todo lo que genera tu link, en un solo lugar: en vivo y sin letras chiquitas.
+        Todo lo que genera tu código, en un solo lugar: en vivo y sin letras chiquitas.
       </p>
       <div className="dash" data-r="">
         <div className="d-head">

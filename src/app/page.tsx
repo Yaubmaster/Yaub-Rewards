@@ -10,7 +10,7 @@ export const dynamic = 'force-dynamic';
 export const metadata: Metadata = {
   title: 'Yaub Rewards — Tú refieres. La IA vende. Tú cobras.',
   description:
-    'Comparte tu link, los agentes de IA de Yaub atienden, cierran la venta y cobran — y tu comisión cae sola. Gratis, para siempre.',
+    'Comparte tu código único: los agentes de IA de Yaub atienden, cierran la venta y registran tu comisión solos. Gratis, para siempre.',
 };
 
 export default async function Bienvenida() {

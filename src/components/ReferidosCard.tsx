@@ -147,13 +147,13 @@ export function ReferidosCard({
       </div>
 
       {/* Badges por hitos */}
-      <div className="mt-3.5 flex gap-2">
+      <div className="mt-3.5 flex flex-wrap gap-2">
         {HITOS.map((h) => {
           const logrado = referidos.length >= h.n;
           return (
             <div
               key={h.n}
-              className="flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-[11px] font-bold"
+              className="flex items-center gap-1.5 whitespace-nowrap rounded-full border px-3 py-1.5 text-[11px] font-bold"
               style={
                 logrado
                   ? { background: 'rgba(139,92,246,.1)', borderColor: 'rgba(139,92,246,.35)', color: '#7C3AED' }
