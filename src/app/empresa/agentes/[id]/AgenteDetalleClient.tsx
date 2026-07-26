@@ -10,8 +10,10 @@ import { supabaseBrowser } from '@/lib/supabase/client';
 import { Avatar, AvatarEditable } from '@/components/Avatar';
 import { Icon, ICON_PATHS } from '@/components/icons';
 import { PromptAgente } from '@/components/PromptAgente';
+import { urlAgente, urlNumerosWhatsApp, urlPlayground } from '@/lib/plataforma';
 import {
   agentesApi,
+  asegurarChatWeb,
   estadoAgente,
   guardarAvatarAgente,
   interaccionesRestantes,
@@ -19,9 +21,8 @@ import {
   type ContextoConocimiento,
   type ContextoImagen,
   type EmpresaConAgente,
+  type NumeroWhatsApp,
 } from '@/lib/agentesApi';
-
-const PLATAFORMA_URL = 'https://platform.yaub.ai';
 
 // ── Chat de prueba (usa la edge function pública widget-chat) ────────────────
 function visitorId(): string {
@@ -60,7 +61,15 @@ interface Mensaje {
   text: string;
 }
 
-function ChatPrueba({ widgetKey, pausado }: { widgetKey: string; pausado: boolean }) {
+function ChatPrueba({
+  widgetKey,
+  pausado,
+  assistantId,
+}: {
+  widgetKey: string;
+  pausado: boolean;
+  assistantId: string;
+}) {
   const [mensajes, setMensajes] = useState<Mensaje[]>([]);
   const [texto, setTexto] = useState('');
   const [pensando, setPensando] = useState(false);
@@ -114,8 +123,8 @@ function ChatPrueba({ widgetKey, pausado }: { widgetKey: string; pausado: boolea
     <div className="card overflow-hidden p-0">
       <div className="flex items-center gap-2 border-b border-line px-4 py-3">
         <span className={`h-2 w-2 rounded-full ${pausado ? 'bg-amber1' : 'animate-pulseDot bg-green1'}`} />
-        <span className="text-[13px] font-bold">Prueba tu agente</span>
-        <span className="ml-auto text-[11px] text-slate3">chat web en vivo</span>
+        <span className="text-[13px] font-bold">Mini playground</span>
+        <span className="ml-auto text-[11px] text-slate3">chat en vivo</span>
       </div>
 
       <div ref={fondoRef} className="flex h-[340px] flex-col gap-2.5 overflow-y-auto bg-surface/60 px-4 py-4">
@@ -166,6 +175,97 @@ function ChatPrueba({ widgetKey, pausado }: { widgetKey: string; pausado: boolea
           <Icon d={ICON_PATHS.send} size={18} stroke="#fff" strokeWidth={2} />
         </button>
       </div>
+
+      <div className="flex flex-wrap items-center justify-between gap-2 border-t border-line px-4 py-2.5">
+        <span className="text-[11.5px] text-slate3">
+          ¿Quieres probar voz, ver las tools que usa y medir tokens?
+        </span>
+        <a
+          href={urlPlayground(assistantId)}
+          target="_blank"
+          rel="noreferrer"
+          className="flex shrink-0 items-center gap-1.5 text-[12px] font-bold text-[#0EA5E9] transition-colors hover:text-violet1"
+        >
+          Playground de Yaub
+          <Icon d={ICON_PATHS.external} size={12} strokeWidth={2} />
+        </a>
+      </div>
+    </div>
+  );
+}
+
+// ── Canales del agente ───────────────────────────────────────────────────────
+// Si ya tiene números ligados los enseña; el link a Yaub sirve para agregar
+// otro. El chat web se prende solo al abrir el agente, así que casi siempre
+// aparece encendido.
+function CanalesAgente({
+  numeros,
+  chatWeb,
+}: {
+  numeros: NumeroWhatsApp[];
+  chatWeb: boolean;
+}) {
+  const activos = numeros.filter((n) => n.activo);
+  const fmt = (n: string) => {
+    const d = (n ?? '').replace(/\D/g, '');
+    if (d.length < 10) return n;
+    const u = d.slice(-10);
+    return `+${d.slice(0, d.length - 10)} ${u.slice(0, 2)} ${u.slice(2, 6)} ${u.slice(6)}`.trim();
+  };
+
+  return (
+    <div className="card p-4">
+      <div className="text-sm font-bold">Canales</div>
+      <div className="mb-3 text-xs text-slate3">Dónde puede atender tu agente.</div>
+
+      <div className="flex flex-col gap-2">
+        <div className="flex items-center gap-2.5 rounded-xl border border-line bg-surface px-3.5 py-2.5">
+          <span
+            className={`h-2 w-2 shrink-0 rounded-full ${chatWeb ? 'animate-pulseDot' : ''}`}
+            style={{ background: chatWeb ? '#00D4FF' : '#94A3B8' }}
+          />
+          <span className="min-w-0 flex-1 text-[13px] font-bold">Chat web</span>
+          <span className="shrink-0 text-[11px] text-slate3">
+            {chatWeb ? 'Encendido' : 'Apagado'}
+          </span>
+        </div>
+
+        {numeros.map((n) => (
+          <div
+            key={n.id}
+            className="flex items-center gap-2.5 rounded-xl border border-line bg-surface px-3.5 py-2.5"
+          >
+            <span
+              className={`h-2 w-2 shrink-0 rounded-full ${n.activo ? 'animate-pulseDot' : ''}`}
+              style={{ background: n.activo ? '#25D366' : '#94A3B8' }}
+            />
+            <div className="min-w-0 flex-1">
+              <div className="truncate text-[13px] font-bold">WhatsApp {fmt(n.numero)}</div>
+              {n.nombre && <div className="truncate text-[11px] text-slate3">{n.nombre}</div>}
+            </div>
+            <span className="shrink-0 text-[11px] text-slate3">
+              {n.activo ? 'Conectado' : 'Pausado'}
+            </span>
+          </div>
+        ))}
+      </div>
+
+      <a
+        href={urlNumerosWhatsApp()}
+        target="_blank"
+        rel="noreferrer"
+        className="mt-2.5 flex items-center justify-center gap-2 rounded-xl border border-dashed border-line px-3.5 py-2.5 text-[12.5px] font-bold text-slate2 transition-colors hover:border-cyan1 hover:text-[#0EA5E9]"
+      >
+        <Icon d={ICON_PATHS.plus} size={14} strokeWidth={2} />
+        {numeros.length === 0 ? 'Conectar número de WhatsApp' : 'Conectar otro número'}
+      </a>
+      <p className="mt-2 text-[11.5px] text-slate3">
+        {activos.length === 0
+          ? 'Se abre el módulo de números de Yaub, donde das de alta el tuyo y lo ligas a este agente.'
+          : activos.length === 1
+            ? 'Tu agente ya contesta en este número.'
+            : `Tu agente ya contesta en ${activos.length} números.`}
+      </p>
     </div>
   );
 }
@@ -218,9 +318,19 @@ export function AgenteDetalleClient({ assistantId }: { assistantId: string }) {
 
   const cargar = useCallback(async () => {
     try {
-      const empresas = await misEmpresasAgentes();
-      const propia = empresas.find((e) => e.agente?.id === assistantId);
+      let empresas = await misEmpresasAgentes();
+      let propia = empresas.find((e) => e.agente?.id === assistantId);
       if (!propia) throw new Error('Ese agente no es de una de tus empresas');
+
+      // Todo agente con Rewards se prueba aquí mismo: si no trae el chat web
+      // prendido, se le prende solo y se relee para tener ya la llave.
+      if (!propia.agente?.widget_key) {
+        const key = await asegurarChatWeb(assistantId);
+        if (key) {
+          empresas = await misEmpresasAgentes();
+          propia = empresas.find((e) => e.agente?.id === assistantId) ?? propia;
+        }
+      }
       setItem(propia);
 
       const ctx = await agentesApi<{
@@ -373,15 +483,36 @@ export function AgenteDetalleClient({ assistantId }: { assistantId: string }) {
             <div className="text-xs text-slate3">{item.empresa} · chat web</div>
           </div>
         </div>
-        <a
-          href={`${PLATAFORMA_URL}/assistants/${agente.id}`}
-          target="_blank"
-          rel="noreferrer"
-          className="flex items-center gap-2 rounded-xl border border-line bg-white px-4 py-2.5 text-[13px] font-bold text-slate2 transition-colors hover:border-violet1 hover:text-violet1"
-        >
-          <Icon d={ICON_PATHS.external} size={15} />
-          Abrir en Yaub
-        </a>
+        <div className="flex flex-wrap items-center gap-2">
+          {agente.widget_key && (
+            <button
+              onClick={() =>
+                document.getElementById('chat-prueba')?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+              }
+              className="btn-gradient px-4 py-2.5 text-[13px]"
+            >
+              Probar
+            </button>
+          )}
+          <a
+            href={urlPlayground(agente.id)}
+            target="_blank"
+            rel="noreferrer"
+            className="flex items-center gap-2 rounded-xl border border-line bg-white px-4 py-2.5 text-[13px] font-bold text-slate2 transition-colors hover:border-violet1 hover:text-violet1"
+          >
+            <Icon d={ICON_PATHS.spark} size={15} />
+            Probar en playground
+          </a>
+          <a
+            href={urlAgente(agente.id)}
+            target="_blank"
+            rel="noreferrer"
+            className="flex items-center gap-2 rounded-xl border border-line bg-white px-4 py-2.5 text-[13px] font-bold text-slate2 transition-colors hover:border-violet1 hover:text-violet1"
+          >
+            <Icon d={ICON_PATHS.external} size={15} />
+            Abrir en Yaub
+          </a>
+        </div>
       </div>
 
       {/* Estado del trial */}
@@ -404,7 +535,7 @@ Se acabaron tus {agente.interacciones_incluidas} interacciones gratis.
             Yaub para que vuelva a responder.
           </p>
           <a
-            href={`${PLATAFORMA_URL}/assistants/${agente.id}`}
+            href={urlAgente(agente.id)}
             target="_blank"
             rel="noreferrer"
             className="btn-gradient mt-2.5 inline-block px-4 py-2.5 text-[13px]"
@@ -424,13 +555,31 @@ Se acabaron tus {agente.interacciones_incluidas} interacciones gratis.
         {/* Chat de prueba */}
         <div className="flex min-w-0 flex-col gap-4">
           <PromptAgente assistantId={assistantId} />
-          {agente.widget_key ? (
-            <ChatPrueba widgetKey={agente.widget_key} pausado={pausado} />
-          ) : (
-            <div className="card p-6 text-center text-sm text-slate2">
-              Este agente no tiene chat web habilitado. Ábrelo en Yaub para configurarlo.
-            </div>
-          )}
+          <div id="chat-prueba" className="scroll-mt-24">
+            {agente.widget_key ? (
+              <ChatPrueba
+                widgetKey={agente.widget_key}
+                pausado={pausado}
+                assistantId={assistantId}
+              />
+            ) : (
+              <div className="card p-6 text-center">
+                <div className="text-sm font-bold">Prendiendo el chat de prueba…</div>
+                <p className="mx-auto mt-1 max-w-[380px] text-[13px] text-slate2">
+                  Si no aparece, es que solo el dueño de la cuenta Yaub puede prenderlo. Mientras,
+                  pruébalo en el playground.
+                </p>
+                <a
+                  href={urlPlayground(assistantId)}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="btn-gradient mt-4 inline-block px-5 py-2.5 text-[13px]"
+                >
+                  Probar en playground
+                </a>
+              </div>
+            )}
+          </div>
         </div>
 
         {/* Contexto opcional */}
@@ -452,6 +601,8 @@ Se acabaron tus {agente.interacciones_incluidas} interacciones gratis.
               }}
             />
           </div>
+
+          <CanalesAgente numeros={agente.whatsapp ?? []} chatWeb={!!agente.widget_key} />
 
           <div className="text-[13px] font-bold text-slate2">
             Dale contexto a tu agente <span className="font-medium text-slate3">(opcional)</span>

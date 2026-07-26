@@ -117,6 +117,12 @@ liberación es idempotente (trigger `trg_rewards_liberar_bono` sobre
   sincroniza con `activa` y la migración ya están; **falta la UI** para poner
   en borrador, publicar y pausar. La oferta "prueba" se pausó por SQL.
 
+- **Que el deep link sobreviva al login en la plataforma.** Hoy, si llegas de
+  Rewards sin sesión abierta en `platform.yaub.ai`, después de entrar te deja
+  en tu dashboard y no en el agente o el playground al que ibas. El cambio va
+  en `App.tsx` del repo `yaub-platform` (guardar la ruta pedida antes de
+  redirigir al default). Desde Rewards no se puede.
+
 ### Decisiones que dependen de ti
 
 - **Ligar las cuentas.** `jjpb.18@gmail.com` (con la que entras a Rewards) no
@@ -128,9 +134,6 @@ liberación es idempotente (trigger `trg_rewards_liberar_bono` sobre
   `platform.yaub.ai`. Si va a haber checkout propio, hay que apuntarlo ahí.
 - **URLs de Términos y Privacidad.** Hoy apuntan a `https://yaub.ai/terminos`
   y `/privacidad`. Confirmar que existen.
-- **`widget_public_key` en el agente de Yaub Móvil.** Habilitarla haría que el
-  chat de prueba funcione dentro de Rewards, pero **expone un endpoint de chat
-  público en un agente de producción**. No lo activé.
 
 ### Deuda conocida
 
@@ -154,6 +157,52 @@ liberación es idempotente (trigger `trg_rewards_liberar_bono` sobre
 ---
 
 ## 5. Trampas con las que ya nos tropezamos
+
+**El chat web se prende solo, y eso expone un endpoint público.** Al abrir un
+agente en Rewards, si no trae `widget_public_key` se le genera una
+(`rewards.asegurar_chat_web`, INVOKER e idempotente) y se le agrega
+`rewards.yaub.ai` a `widget_config.allowed_domains`, sin pisar el resto de la
+config. **Consecuencia a tener presente:** con el widget prendido, cualquiera
+que tenga la llave puede chatear con ese agente desde la página `/w/<key>` de
+la plataforma — así está diseñado el widget de Yaub. La llave es inadivinable,
+pero es exposición real y consume interacciones. Se hizo a petición explícita;
+si algún día no se quiere para cierto agente, hay que apagar
+`widget_config.enabled`.
+
+**Los números de WhatsApp no viven en `assistants`.** Están en
+`public.whatsapp_numbers` (con `assistant_id`, `phone_number`, `is_active`).
+`assistants.whatsapp_phone_number` viene nulo aunque el número exista — por eso
+el foquito de WhatsApp no prendía. Cualquier cosa que pregunte "¿tiene
+WhatsApp?" tiene que mirar `whatsapp_numbers`.
+
+**La plataforma usa hash routing y no tiene rewrite catch-all.** Su router lee
+`window.location.hash`, y el `vercel.json` de `yaub-platform` **no** manda todo
+a `index.html`. O sea que `platform.yaub.ai/core-ia/assistants/<id>/workspace`
+devuelve un 404 de Vercel y la app ni siquiera carga — por eso "Abrir en Yaub"
+mandaba a una página de error. La ruta buena lleva `#`:
+`platform.yaub.ai/#/core-ia/assistants/<id>/workspace?advanced=1`. **Todo link
+a la plataforma sale de `src/lib/plataforma.ts`**, que ya tiene las rutas
+verificadas contra el repo `Yaubmaster/yaub-platform`:
+
+| Para | Ruta |
+|---|---|
+| Workspace del agente (config avanzada, canales, billing) | `#/core-ia/assistants/<id>/workspace?advanced=1` |
+| Playground de un agente | `#/playground/<id>` |
+| Números de WhatsApp | `#/yaubchat/numbers` |
+
+**La sesión no viaja entre subdominios.** Es la misma cuenta y el mismo
+proyecto de Supabase, pero **no** la misma sesión de navegador: Rewards guarda
+la suya en **cookies** (`@supabase/ssr`) y la plataforma en **localStorage**
+(`supabase-js` normal), y localStorage es por origen. Si ya tienes sesión
+abierta en `platform.yaub.ai` los links entran directo; si no, te pide entrar
+con la misma cuenta.
+
+Y ojo con esto: en un **login fresco** la plataforma se brinca el deep link.
+`App.tsx` guarda un marcador en `sessionStorage` y, la primera vez que entras
+en esa pestaña, te manda a tu ruta por defecto en lugar de a donde ibas. Si
+alguna vez queremos que el link aterrice fino después de iniciar sesión, hay
+que respetar la ruta pedida **en la plataforma** — no se puede arreglar desde
+Rewards.
 
 **El estado del cliente no se resetea al cambiar de empresa.** Las pantallas de
 `/empresa` guardan los datos del servidor en `useState`. `router.refresh()`

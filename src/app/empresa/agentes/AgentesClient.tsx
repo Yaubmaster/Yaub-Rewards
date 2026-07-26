@@ -9,6 +9,7 @@ import { supabaseBrowser } from '@/lib/supabase/client';
 import { Avatar } from '@/components/Avatar';
 import { Icon, ICON_PATHS } from '@/components/icons';
 import { INTERACCIONES_TRIAL, PLAN_MENSUAL, type AgenteDeCuenta } from '@/lib/agentesApi';
+import { urlPlayground } from '@/lib/plataforma';
 
 function Estado({ a }: { a: AgenteDeCuenta }) {
   const restantes = Math.max(0, a.interacciones_incluidas - a.interacciones_usadas);
@@ -131,20 +132,37 @@ export function AgentesClient() {
           <div className="mt-6 text-[13px] font-bold text-slate3">VENDIENDO EN REWARDS</div>
           <div className="mt-2 flex flex-col gap-3">
             {activados.map((a) => (
-              <Link
+              // El renglón entero no puede ser un <Link>: adentro va otra ancla
+              // (el playground) y anidar <a> dentro de <a> es HTML inválido.
+              <div
                 key={a.assistant_id}
-                href={`/empresa/agentes/${a.assistant_id}`}
-                className="card flex items-center gap-4 p-4 transition-all hover:-translate-y-0.5 hover:border-cyan1 md:p-5"
+                className="card flex flex-wrap items-center gap-x-4 gap-y-3 p-4 transition-all hover:border-cyan1 md:p-5"
               >
-                <Avatar url={a.avatar_url} nombre={a.nombre} size={44} icono="bot" />
-                <div className="min-w-0 flex-1">
-                  <div className="truncate text-[15px] font-bold">{a.nombre}</div>
-                  <div className="mt-0.5 text-xs text-slate3">
-                    {a.tenant} · {a.ofertas === 1 ? '1 oferta' : `${a.ofertas} ofertas`}
+                <Link
+                  href={`/empresa/agentes/${a.assistant_id}`}
+                  className="flex min-w-0 flex-1 items-center gap-4"
+                >
+                  <Avatar url={a.avatar_url} nombre={a.nombre} size={44} icono="bot" />
+                  <div className="min-w-0 flex-1">
+                    <div className="truncate text-[15px] font-bold">{a.nombre}</div>
+                    <div className="mt-0.5 text-xs text-slate3">
+                      {a.tenant} · {a.ofertas === 1 ? '1 oferta' : `${a.ofertas} ofertas`}
+                    </div>
                   </div>
+                </Link>
+                <div className="flex shrink-0 items-center gap-2">
+                  <Estado a={a} />
+                  <a
+                    href={urlPlayground(a.assistant_id)}
+                    target="_blank"
+                    rel="noreferrer"
+                    title="Probar en el playground de Yaub"
+                    className="whitespace-nowrap rounded-xl border border-line bg-white px-3 py-1.5 text-[12.5px] font-bold text-slate2 transition-colors hover:border-violet1 hover:text-violet1"
+                  >
+                    Probar
+                  </a>
                 </div>
-                <Estado a={a} />
-              </Link>
+              </div>
             ))}
           </div>
         </>
