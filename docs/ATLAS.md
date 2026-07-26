@@ -117,6 +117,12 @@ liberación es idempotente (trigger `trg_rewards_liberar_bono` sobre
   sincroniza con `activa` y la migración ya están; **falta la UI** para poner
   en borrador, publicar y pausar. La oferta "prueba" se pausó por SQL.
 
+- **Que el deep link sobreviva al login en la plataforma.** Hoy, si llegas de
+  Rewards sin sesión abierta en `platform.yaub.ai`, después de entrar te deja
+  en tu dashboard y no en el agente o el playground al que ibas. El cambio va
+  en `App.tsx` del repo `yaub-platform` (guardar la ruta pedida antes de
+  redirigir al default). Desde Rewards no se puede.
+
 ### Decisiones que dependen de ti
 
 - **Ligar las cuentas.** `jjpb.18@gmail.com` (con la que entras a Rewards) no
@@ -154,6 +160,35 @@ liberación es idempotente (trigger `trg_rewards_liberar_bono` sobre
 ---
 
 ## 5. Trampas con las que ya nos tropezamos
+
+**La plataforma usa hash routing y no tiene rewrite catch-all.** Su router lee
+`window.location.hash`, y el `vercel.json` de `yaub-platform` **no** manda todo
+a `index.html`. O sea que `platform.yaub.ai/core-ia/assistants/<id>/workspace`
+devuelve un 404 de Vercel y la app ni siquiera carga — por eso "Abrir en Yaub"
+mandaba a una página de error. La ruta buena lleva `#`:
+`platform.yaub.ai/#/core-ia/assistants/<id>/workspace?advanced=1`. **Todo link
+a la plataforma sale de `src/lib/plataforma.ts`**, que ya tiene las rutas
+verificadas contra el repo `Yaubmaster/yaub-platform`:
+
+| Para | Ruta |
+|---|---|
+| Workspace del agente (config avanzada, canales, billing) | `#/core-ia/assistants/<id>/workspace?advanced=1` |
+| Playground de un agente | `#/playground/<id>` |
+| Números de WhatsApp | `#/yaubchat/numbers` |
+
+**La sesión no viaja entre subdominios.** Es la misma cuenta y el mismo
+proyecto de Supabase, pero **no** la misma sesión de navegador: Rewards guarda
+la suya en **cookies** (`@supabase/ssr`) y la plataforma en **localStorage**
+(`supabase-js` normal), y localStorage es por origen. Si ya tienes sesión
+abierta en `platform.yaub.ai` los links entran directo; si no, te pide entrar
+con la misma cuenta.
+
+Y ojo con esto: en un **login fresco** la plataforma se brinca el deep link.
+`App.tsx` guarda un marcador en `sessionStorage` y, la primera vez que entras
+en esa pestaña, te manda a tu ruta por defecto en lugar de a donde ibas. Si
+alguna vez queremos que el link aterrice fino después de iniciar sesión, hay
+que respetar la ruta pedida **en la plataforma** — no se puede arreglar desde
+Rewards.
 
 **El estado del cliente no se resetea al cambiar de empresa.** Las pantallas de
 `/empresa` guardan los datos del servidor en `useState`. `router.refresh()`

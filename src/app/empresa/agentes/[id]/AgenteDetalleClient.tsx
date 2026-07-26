@@ -10,6 +10,7 @@ import { supabaseBrowser } from '@/lib/supabase/client';
 import { Avatar, AvatarEditable } from '@/components/Avatar';
 import { Icon, ICON_PATHS } from '@/components/icons';
 import { PromptAgente } from '@/components/PromptAgente';
+import { urlAgente, urlNumerosWhatsApp, urlPlayground } from '@/lib/plataforma';
 import {
   agentesApi,
   estadoAgente,
@@ -20,8 +21,6 @@ import {
   type ContextoImagen,
   type EmpresaConAgente,
 } from '@/lib/agentesApi';
-
-const PLATAFORMA_URL = 'https://platform.yaub.ai';
 
 // ── Chat de prueba (usa la edge function pública widget-chat) ────────────────
 function visitorId(): string {
@@ -373,15 +372,36 @@ export function AgenteDetalleClient({ assistantId }: { assistantId: string }) {
             <div className="text-xs text-slate3">{item.empresa} · chat web</div>
           </div>
         </div>
-        <a
-          href={`${PLATAFORMA_URL}/assistants/${agente.id}`}
-          target="_blank"
-          rel="noreferrer"
-          className="flex items-center gap-2 rounded-xl border border-line bg-white px-4 py-2.5 text-[13px] font-bold text-slate2 transition-colors hover:border-violet1 hover:text-violet1"
-        >
-          <Icon d={ICON_PATHS.external} size={15} />
-          Abrir en Yaub
-        </a>
+        <div className="flex flex-wrap items-center gap-2">
+          {agente.widget_key && (
+            <button
+              onClick={() =>
+                document.getElementById('chat-prueba')?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+              }
+              className="btn-gradient px-4 py-2.5 text-[13px]"
+            >
+              Probar
+            </button>
+          )}
+          <a
+            href={urlPlayground(agente.id)}
+            target="_blank"
+            rel="noreferrer"
+            className="flex items-center gap-2 rounded-xl border border-line bg-white px-4 py-2.5 text-[13px] font-bold text-slate2 transition-colors hover:border-violet1 hover:text-violet1"
+          >
+            <Icon d={ICON_PATHS.spark} size={15} />
+            Probar en playground
+          </a>
+          <a
+            href={urlAgente(agente.id)}
+            target="_blank"
+            rel="noreferrer"
+            className="flex items-center gap-2 rounded-xl border border-line bg-white px-4 py-2.5 text-[13px] font-bold text-slate2 transition-colors hover:border-violet1 hover:text-violet1"
+          >
+            <Icon d={ICON_PATHS.external} size={15} />
+            Abrir en Yaub
+          </a>
+        </div>
       </div>
 
       {/* Estado del trial */}
@@ -404,7 +424,7 @@ Se acabaron tus {agente.interacciones_incluidas} interacciones gratis.
             Yaub para que vuelva a responder.
           </p>
           <a
-            href={`${PLATAFORMA_URL}/assistants/${agente.id}`}
+            href={urlAgente(agente.id)}
             target="_blank"
             rel="noreferrer"
             className="btn-gradient mt-2.5 inline-block px-4 py-2.5 text-[13px]"
@@ -424,13 +444,27 @@ Se acabaron tus {agente.interacciones_incluidas} interacciones gratis.
         {/* Chat de prueba */}
         <div className="flex min-w-0 flex-col gap-4">
           <PromptAgente assistantId={assistantId} />
-          {agente.widget_key ? (
-            <ChatPrueba widgetKey={agente.widget_key} pausado={pausado} />
-          ) : (
-            <div className="card p-6 text-center text-sm text-slate2">
-              Este agente no tiene chat web habilitado. Ábrelo en Yaub para configurarlo.
-            </div>
-          )}
+          <div id="chat-prueba" className="scroll-mt-24">
+            {agente.widget_key ? (
+              <ChatPrueba widgetKey={agente.widget_key} pausado={pausado} />
+            ) : (
+              <div className="card p-6 text-center">
+                <div className="text-sm font-bold">Este agente no tiene chat web prendido</div>
+                <p className="mx-auto mt-1 max-w-[380px] text-[13px] text-slate2">
+                  Puedes probarlo igual en el playground de Yaub, donde ves en vivo qué tools va
+                  usando.
+                </p>
+                <a
+                  href={urlPlayground(assistantId)}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="btn-gradient mt-4 inline-block px-5 py-2.5 text-[13px]"
+                >
+                  Probar en playground
+                </a>
+              </div>
+            )}
+          </div>
         </div>
 
         {/* Contexto opcional */}
@@ -451,6 +485,29 @@ Se acabaron tus {agente.interacciones_incluidas} interacciones gratis.
                 await cargar();
               }}
             />
+          </div>
+
+          <div className="card p-4">
+            <div className="text-sm font-bold">Canales</div>
+            <div className="mb-3 text-xs text-slate3">
+              Dónde puede atender tu agente. WhatsApp es donde más venden.
+            </div>
+            <a
+              href={urlNumerosWhatsApp()}
+              target="_blank"
+              rel="noreferrer"
+              className="flex items-center gap-2.5 rounded-xl border border-line bg-surface px-3.5 py-3 transition-colors hover:border-cyan1"
+            >
+              <span className="h-2 w-2 shrink-0 rounded-full" style={{ background: '#25D366' }} />
+              <span className="min-w-0 flex-1 text-[13px] font-bold">
+                Conectar número de WhatsApp
+              </span>
+              <Icon d={ICON_PATHS.external} size={14} stroke="rgb(var(--tinta3))" />
+            </a>
+            <p className="mt-2 text-[11.5px] text-slate3">
+              Se abre el módulo de números de Yaub, donde das de alta el tuyo y lo ligas a este
+              agente.
+            </p>
           </div>
 
           <div className="text-[13px] font-bold text-slate2">
