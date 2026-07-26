@@ -29,10 +29,19 @@ export interface AgenteDeCuenta {
   con_plan: boolean;
 }
 
+/** Un número de WhatsApp ligado al agente (public.whatsapp_numbers). */
+export interface NumeroWhatsApp {
+  id: string;
+  numero: string;
+  nombre: string | null;
+  activo: boolean;
+}
+
 export interface AgenteDeEmpresa {
   id: string;
   nombre: string;
   avatar_url: string | null;
+  whatsapp: NumeroWhatsApp[];
   activo: boolean;
   widget_key: string | null;
   interacciones_incluidas: number;
@@ -93,6 +102,19 @@ export async function guardarAvatarAgente(assistantId: string, url: string | nul
         : 'No se pudo guardar la foto.',
     );
   }
+}
+
+/**
+ * Prende el chat web del agente si no lo tiene, para que se pueda probar aquí
+ * mismo. Genera la llave `wk_` y agrega rewards.yaub.ai a allowed_domains sin
+ * pisar el resto de la configuración del widget. Es idempotente.
+ */
+export async function asegurarChatWeb(assistantId: string): Promise<string | null> {
+  const { data, error } = await supabaseBrowser().rpc('asegurar_chat_web', {
+    p_assistant_id: assistantId,
+  });
+  if (error) return null; // sin permiso: se queda sin chat aquí, no es fatal
+  return ((data ?? null) as { widget_key?: string } | null)?.widget_key ?? null;
 }
 
 /** Cuentas (tenants) de Yaub que el usuario puede administrar desde Rewards. */

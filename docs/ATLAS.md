@@ -134,9 +134,6 @@ liberación es idempotente (trigger `trg_rewards_liberar_bono` sobre
   `platform.yaub.ai`. Si va a haber checkout propio, hay que apuntarlo ahí.
 - **URLs de Términos y Privacidad.** Hoy apuntan a `https://yaub.ai/terminos`
   y `/privacidad`. Confirmar que existen.
-- **`widget_public_key` en el agente de Yaub Móvil.** Habilitarla haría que el
-  chat de prueba funcione dentro de Rewards, pero **expone un endpoint de chat
-  público en un agente de producción**. No lo activé.
 
 ### Deuda conocida
 
@@ -160,6 +157,23 @@ liberación es idempotente (trigger `trg_rewards_liberar_bono` sobre
 ---
 
 ## 5. Trampas con las que ya nos tropezamos
+
+**El chat web se prende solo, y eso expone un endpoint público.** Al abrir un
+agente en Rewards, si no trae `widget_public_key` se le genera una
+(`rewards.asegurar_chat_web`, INVOKER e idempotente) y se le agrega
+`rewards.yaub.ai` a `widget_config.allowed_domains`, sin pisar el resto de la
+config. **Consecuencia a tener presente:** con el widget prendido, cualquiera
+que tenga la llave puede chatear con ese agente desde la página `/w/<key>` de
+la plataforma — así está diseñado el widget de Yaub. La llave es inadivinable,
+pero es exposición real y consume interacciones. Se hizo a petición explícita;
+si algún día no se quiere para cierto agente, hay que apagar
+`widget_config.enabled`.
+
+**Los números de WhatsApp no viven en `assistants`.** Están en
+`public.whatsapp_numbers` (con `assistant_id`, `phone_number`, `is_active`).
+`assistants.whatsapp_phone_number` viene nulo aunque el número exista — por eso
+el foquito de WhatsApp no prendía. Cualquier cosa que pregunte "¿tiene
+WhatsApp?" tiene que mirar `whatsapp_numbers`.
 
 **La plataforma usa hash routing y no tiene rewrite catch-all.** Su router lee
 `window.location.hash`, y el `vercel.json` de `yaub-platform` **no** manda todo
