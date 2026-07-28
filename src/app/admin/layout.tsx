@@ -1,5 +1,6 @@
 import { redirect } from 'next/navigation';
 import { supabaseServer } from '@/lib/supabase/server';
+import AdminMfaGate from '@/components/AdminMfaGate';
 
 // Solo correos en ADMIN_EMAILS (y espejados en rewards.admins, que es lo que
 // valida el RLS del lado de la base).
@@ -16,5 +17,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
     .filter(Boolean);
   if (!admins.includes((user.email ?? '').toLowerCase())) redirect('/');
 
-  return <>{children}</>;
+  // 2FA obligatorio para staff: TOTP + "confiar en este navegador" (7 días).
+  // Mismo modelo (trusted_devices) que yaub-platform.
+  return <AdminMfaGate>{children}</AdminMfaGate>;
 }
