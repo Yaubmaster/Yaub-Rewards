@@ -20,8 +20,12 @@ export default async function LeaderboardPage() {
   if (!freelancer) redirect('/registro/finalizar');
 
   // Sin p_temporada = la temporada en curso. El RPC ya trae la lista de
-  // temporadas con ventas para el filtro, así que es un solo viaje.
-  const { data } = await supabase.rpc('leaderboard_ventas', { p_temporada: null });
+  // temporadas para el filtro, así que es un solo viaje. La pestaña de "en
+  // proceso" la pide el cliente cuando el usuario la toca.
+  const { data } = await supabase.rpc('leaderboard_ventas', {
+    p_temporada: null,
+    p_metrica: 'cerradas',
+  });
 
   return <LeaderboardClient inicial={(data ?? null) as Leaderboard | null} />;
 }

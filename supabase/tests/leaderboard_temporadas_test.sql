@@ -194,6 +194,53 @@ begin
     if v_err not like '%Temporada inv%' then raise; end if;
   end;
 
+  -- ── 6b. Tabla de "en proceso": rankea pendientes, no ventas cerradas ──────
+  -- Diego trae 2 pendientes y 0 cerradas: invisible en la tabla oficial, líder
+  -- en esta. Es justo el caso que motivó la segunda tabla.
+  perform set_config('request.jwt.claims',
+    json_build_object('sub', v_uid_d, 'email', 'zz-lb-diego@test.rewards', 'role', 'authenticated')::text, true);
+  v_lb := rewards.leaderboard_ventas(v_hoy, 200, 'en_proceso');
+
+  if (v_lb ->> 'metrica') <> 'en_proceso' then
+    raise exception 'FALLO: el RPC no reporta la métrica pedida';
+  end if;
+  if (v_lb -> 'yo' ->> 'posicion')::int <> 1 then
+    raise exception 'FALLO: Diego debería liderar en proceso, va en %', v_lb -> 'yo' -> 'posicion';
+  end if;
+  if (v_lb -> 'yo' ->> 'puntos')::int <> 2 then
+    raise exception 'FALLO: los puntos de Diego en proceso deberían ser 2, son %', v_lb -> 'yo' ->> 'puntos';
+  end if;
+  -- La fila conserva el otro dato para dar contexto, sin rankear por él
+  if (v_lb -> 'yo' ->> 'ventas')::int <> 0 then
+    raise exception 'FALLO: Diego no tiene ventas cerradas esta temporada';
+  end if;
+
+  -- Ana lidera cerradas pero no tiene pendientes: no aparece en esta tabla
+  select count(*) into v_n from jsonb_array_elements(v_lb -> 'tabla') f where f->>'nombre' = 'Zz Lbana';
+  if v_n <> 0 then
+    raise exception 'FALLO: Ana aparece en la tabla de en proceso sin tener pendientes';
+  end if;
+
+  -- Y en la tabla oficial Diego sigue fuera: las dos tablas no se contaminan
+  v_lb := rewards.leaderboard_ventas(v_hoy, 200, 'cerradas');
+  if v_lb -> 'yo' -> 'posicion' <> 'null'::jsonb then
+    raise exception 'FALLO: los pendientes de Diego se colaron a la tabla de cerradas';
+  end if;
+
+  -- Los chips de temporada no cambian al alternar de pestaña
+  if rewards.leaderboard_ventas(v_hoy, 200, 'en_proceso') -> 'temporadas'
+     is distinct from rewards.leaderboard_ventas(v_hoy, 200, 'cerradas') -> 'temporadas' then
+    raise exception 'FALLO: la lista de temporadas cambia con la métrica';
+  end if;
+
+  begin
+    perform rewards.leaderboard_ventas(v_hoy, 50, 'lo_que_sea');
+    raise exception 'FALLO: aceptó una métrica inválida';
+  exception when others then
+    get stacked diagnostics v_err = message_text;
+    if v_err not like '%trica inv%' then raise; end if;
+  end;
+
   -- ── 7. Fix: pausar la oferta la saca del marketplace de verdad ────────────
   perform set_config('request.jwt.claims', null, true);
 

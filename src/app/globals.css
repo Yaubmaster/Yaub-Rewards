@@ -19,6 +19,10 @@
   --sombra-card: 0 2px 8px rgba(10, 10, 15, 0.04);
   --shimmer-a: #f1f5f9;
   --shimmer-b: #f8fafc;
+  /* Podio: en claro van tostados para que contrasten con la tarjeta blanca */
+  --oro: 217 119 6;
+  --plata: 100 116 139;
+  --bronce: 154 74 20;
 }
 
 :root[data-tema='dark'] {
@@ -33,6 +37,10 @@
   --sombra-card: 0 2px 10px rgba(0, 0, 0, 0.45);
   --shimmer-a: #1e1f29;
   --shimmer-b: #2a2b37;
+  /* En oscuro suben de luminosidad: el bronce original se perdía en el fondo */
+  --oro: 251 191 36;
+  --plata: 148 163 184;
+  --bronce: 217 119 6;
 }
 
 html,
@@ -51,6 +59,31 @@ body {
 /* El ícono oficial de Yaub es oscuro: sobre fondo oscuro se invierte a blanco */
 :root[data-tema='dark'] .logo-yaub {
   filter: brightness(0) invert(1);
+}
+
+/* `bg-ink` es la superficie invertida (botón primario, badge, burbuja). Su
+   fondo YA se voltea solo, porque --tinta pasa a casi blanco en oscuro — pero
+   el `text-white` que lleva encima se quedaba fijo, y quedaba texto blanco
+   sobre fondo blanco: botones invisibles en Perfil, Capacitación, Mi oferta,
+   registro de empresa y el chat del agente. El contenido sigue al fondo. */
+:root[data-tema='dark'] .bg-ink.text-white,
+:root[data-tema='dark'] .bg-ink .text-white {
+  color: rgb(var(--card));
+}
+
+/* Mismo caso para los íconos de trazo: `stroke="#fff"` es un atributo de
+   presentación, así que esta regla de CSS le gana sin tocar el componente. */
+:root[data-tema='dark'] .bg-ink svg {
+  stroke: rgb(var(--card));
+}
+
+/* Fila del leaderboard que eres tú: el violeta al 6% se pierde sobre la
+   tarjeta oscura, necesita más cuerpo. */
+.destacado-tu {
+  background: rgba(139, 92, 246, 0.06);
+}
+:root[data-tema='dark'] .destacado-tu {
+  background: rgba(139, 92, 246, 0.18);
 }
 
 .input-yaub {

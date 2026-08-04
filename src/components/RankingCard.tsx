@@ -2,6 +2,8 @@
 
 // Enganche del leaderboard en el dashboard del vendedor: en qué lugar va esta
 // temporada y a quién trae enfrente, con link a la tabla completa.
+// Siempre muestra el marcador oficial (ventas cerradas); los referidos en
+// proceso salen como empuje cuando todavía no entras al ranking.
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { Avatar } from '@/components/Avatar';
@@ -14,7 +16,7 @@ export function RankingCard() {
 
   useEffect(() => {
     let vivo = true;
-    cargarLeaderboard()
+    cargarLeaderboard(undefined, 'cerradas')
       .then((d) => vivo && setData(d))
       .catch(() => {});
     return () => {
@@ -58,7 +60,7 @@ export function RankingCard() {
           <span className="text-[13px] text-slate2">
             {yo.posicion === null
               ? 'aún sin ranking'
-              : `de ${totales.vendedores} · ${yo.ventas} ${yo.ventas === 1 ? 'venta' : 'ventas'}`}
+              : `de ${totales.vendedores} · ${yo.puntos} ${yo.puntos === 1 ? 'venta' : 'ventas'}`}
           </span>
         </div>
 
@@ -76,7 +78,7 @@ export function RankingCard() {
                   className="text-[11px] font-bold text-slate2"
                   style={{ fontVariantNumeric: 'tabular-nums' }}
                 >
-                  {f.ventas}
+                  {f.puntos}
                 </span>
               </div>
             ))}
@@ -86,11 +88,11 @@ export function RankingCard() {
 
       <div className="mt-3 text-[13px] font-medium text-slate2">
         {yo.posicion === null
-          ? 'Tu primera venta cerrada te mete a la tabla. 🚀'
+          ? yo.en_proceso > 0
+            ? `Traes ${yo.en_proceso} en proceso. En cuanto se libere el primero, entras al ranking. 🚀`
+            : 'Tu primera venta cerrada te mete a la tabla. 🚀'
           : yo.rival
-            ? `Te ${yo.rival.faltan === 1 ? 'falta' : 'faltan'} ${yo.rival.faltan} ${
-                yo.rival.faltan === 1 ? 'venta' : 'ventas'
-              } para alcanzar a ${yo.rival.nombre.split(' ')[0]}. 🔥`
+            ? `Te ${yo.rival.faltan === 1 ? 'falta' : 'faltan'} ${yo.rival.faltan} para alcanzar a ${yo.rival.nombre.split(' ')[0]}. 🔥`
             : 'Vas #1 de la temporada. 👑'}
       </div>
     </Link>

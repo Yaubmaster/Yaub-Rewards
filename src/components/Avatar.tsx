@@ -149,6 +149,7 @@ export function AvatarEditable({
           className="absolute -bottom-1 -right-1 flex h-6 w-6 items-center justify-center rounded-full border-2 border-card bg-ink text-white"
           aria-hidden
         >
+          {/* stroke lo pinta globals.css en oscuro: la superficie bg-ink se invierte */}
           <Icon d={ICON_PATHS.image} size={12} stroke="#fff" strokeWidth={2} />
         </span>
       </button>
