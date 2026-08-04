@@ -23,7 +23,7 @@ export default function ElegirRol() {
           <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-badge">
             <Icon d={ICON_PATHS.user} size={22} stroke="#fff" strokeWidth={2} />
           </div>
-          <div className="mt-3 text-lg font-bold">Quiero vender</div>
+          <div className="mt-3 text-lg font-bold">Quiero un código y ganar comisiones</div>
           <div className="mt-1 text-sm text-slate2">
             Soy freelancer. Comparto mi código y gano comisiones.
           </div>

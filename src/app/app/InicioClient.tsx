@@ -6,6 +6,7 @@ import { AnimatedNumber } from '@/components/AnimatedNumber';
 import { WeeklyChart } from '@/components/WeeklyChart';
 import { CodigoPill } from '@/components/CodigoBadge';
 import { ReferidosCard } from '@/components/ReferidosCard';
+import { RankingCard } from '@/components/RankingCard';
 import { Icon, ICON_PATHS } from '@/components/icons';
 import { telEnmascarado, tiempoRelativo } from '@/lib/format';
 import type { Freelancer, Referido } from '@/lib/types';
@@ -153,6 +154,9 @@ export function InicioClient({
           <div className="mt-0.5 text-[13px] text-slate2">Se liberan con la primera recarga</div>
         </div>
       </div>
+
+      {/* Ranking de la temporada */}
+      <RankingCard />
 
       {/* Referidos de vendedores (gamificado) */}
       <ReferidosCard freelancerId={freelancer.id} codigo={freelancer.codigo} />

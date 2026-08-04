@@ -4,6 +4,7 @@ import { supabaseServer } from '@/lib/supabase/server';
 
 const NAV: NavItem[] = [
   { href: '/app', label: 'Inicio', icon: 'home' },
+  { href: '/app/leaderboard', label: 'Ranking', icon: 'trofeo' },
   { href: '/app/referidos', label: 'Referidos', icon: 'users' },
   { href: '/app/empresas', label: 'Empresas', icon: 'store' },
   { href: '/app/mis-ofertas', label: 'Mis ofertas', icon: 'heart', corta: 'Ofertas' },

@@ -1,6 +1,7 @@
 export type EmpresaEstado = 'en_revision' | 'autorizada';
 export type CapacitacionTipo = 'en_linea' | 'presencial' | 'ninguna';
 export type ReferidoEstatus = 'pendiente' | 'liberado' | 'pagado';
+export type OfertaEstado = 'borrador' | 'publicada' | 'pausada';
 
 export interface Freelancer {
   id: string;
@@ -33,6 +34,8 @@ export interface Oferta {
   comision_mxn: number;
   condicion_liberacion: string | null;
   capacitacion: CapacitacionTipo;
+  /** Lo que filtra el marketplace. `activa` es la bandera vieja, derivada por trigger. */
+  estado: OfertaEstado;
   activa: boolean;
   created_at: string;
 }

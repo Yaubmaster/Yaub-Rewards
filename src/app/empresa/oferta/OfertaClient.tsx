@@ -13,7 +13,8 @@ interface OfertaForm {
   comision: string;
   condicion: string;
   capacitacion: CapacitacionTipo;
-  activa: boolean;
+  /** Lo que decide si sale en el marketplace: se guarda como `estado`, no como `activa` */
+  publicada: boolean;
   fotos: string[];
 }
 
@@ -25,7 +26,7 @@ const desdeDb = (o: Oferta): OfertaForm => ({
   comision: String(Math.round(Number(o.comision_mxn))),
   condicion: o.condicion_liberacion ?? '',
   capacitacion: o.capacitacion,
-  activa: o.activa,
+  publicada: o.estado ? o.estado === 'publicada' : o.activa,
   fotos: Array.isArray(o.fotos) ? o.fotos : [],
 });
 
@@ -37,7 +38,7 @@ const NUEVA: OfertaForm = {
   comision: '',
   condicion: '',
   capacitacion: 'en_linea',
-  activa: true,
+  publicada: true,
   fotos: [],
 };
 
@@ -167,7 +168,9 @@ export function OfertaClient({
         comision_mxn: parseFloat(o.comision.replace(/[^\d.]/g, '')) || 0,
         condicion_liberacion: o.condicion.trim() || null,
         capacitacion: o.capacitacion,
-        activa: o.activa,
+        // `estado` es lo que filtra el marketplace; `activa` la deriva un
+        // trigger. Escribir la bandera vieja dejaba la oferta visible al pausarla.
+        estado: (o.publicada ? 'publicada' : 'pausada') as Oferta['estado'],
         fotos: o.fotos,
       };
       if (o.id) {
@@ -222,14 +225,17 @@ export function OfertaClient({
             <div className="mb-3.5 flex items-center justify-between">
               <div className="text-xs font-bold tracking-[0.08em] text-slate3">SERVICIO {i + 1}</div>
               <div className="flex items-center gap-4">
-                <label className="flex cursor-pointer items-center gap-1.5 text-xs font-semibold text-slate2">
+                <label
+                  className="flex cursor-pointer items-center gap-1.5 text-xs font-semibold text-slate2"
+                  title="Si la apagas, deja de aparecer en el marketplace de los vendedores"
+                >
                   <input
                     type="checkbox"
-                    checked={o.activa}
-                    onChange={(e) => upd(i, { activa: e.target.checked })}
+                    checked={o.publicada}
+                    onChange={(e) => upd(i, { publicada: e.target.checked })}
                     className="accent-[#8B5CF6]"
                   />
-                  Activa
+                  {o.publicada ? 'Publicada' : 'Pausada'}
                 </label>
                 {ofertas.length > 1 && (
                   <button
