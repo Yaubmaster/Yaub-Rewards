@@ -8,9 +8,10 @@ export const dynamic = 'force-dynamic';
 export default async function NuevoAgentePage({
   searchParams,
 }: {
-  searchParams?: { empresa?: string };
+  searchParams: Promise<{ empresa?: string }>;
 }) {
-  const supabase = supabaseServer();
+  const { empresa: empresaPedida } = await searchParams;
+  const supabase = await supabaseServer();
   const {
     data: { user },
   } = await supabase.auth.getUser();
@@ -18,7 +19,7 @@ export default async function NuevoAgentePage({
 
   const { empresa, empresas } = await empresaActiva(supabase, user.id);
   // ?empresa= permite crear el agente de cualquiera de sus empresas, no solo la activa
-  const elegida = empresas.find((e) => e.id === searchParams?.empresa) ?? empresa;
+  const elegida = empresas.find((e) => e.id === empresaPedida) ?? empresa;
   if (!elegida) redirect('/registro/finalizar');
 
   return <NuevoAgenteClient empresaId={elegida.id} empresaNombre={elegida.nombre} />;

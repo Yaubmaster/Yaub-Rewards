@@ -15,7 +15,7 @@ const NAV: NavItem[] = [
 ];
 
 export default async function EmpresaLayout({ children }: { children: React.ReactNode }) {
-  const supabase = supabaseServer();
+  const supabase = await supabaseServer();
   const {
     data: { user },
   } = await supabase.auth.getUser();

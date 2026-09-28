@@ -1,0 +1,27 @@
+// rewards.yaub.ai se sirve desde Cloudflare Workers con el adaptador OpenNext
+// (@opennextjs/cloudflare): `npm run deploy` compila Next y sube el Worker.
+// Todas las páginas son dinámicas (sin ISR), así que no hace falta caché en R2.
+// Secreto de runtime: ADMIN_EMAILS (`npx wrangler secret put ADMIN_EMAILS`).
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "yaub-rewards",
+  "account_id": "5b949a34f95cacc109d59ae3b15ae13b",
+  "main": ".open-next/worker.js",
+  "compatibility_date": "2026-09-27",
+  "compatibility_flags": ["nodejs_compat", "global_fetch_strictly_public"],
+  "assets": {
+    "directory": ".open-next/assets",
+    "binding": "ASSETS"
+  },
+  "services": [
+    { "binding": "WORKER_SELF_REFERENCE", "service": "yaub-rewards" }
+  ],
+  "vars": {
+    "NEXT_PUBLIC_SITE_URL": "https://rewards.yaub.ai"
+  },
+  "routes": [
+    { "pattern": "rewards.yaub.ai", "custom_domain": true }
+  ],
+  "workers_dev": true,
+  "observability": { "enabled": true }
+}

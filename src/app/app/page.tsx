@@ -6,7 +6,7 @@ import { InicioClient } from './InicioClient';
 export const dynamic = 'force-dynamic';
 
 export default async function Inicio() {
-  const supabase = supabaseServer();
+  const supabase = await supabaseServer();
   const {
     data: { user },
   } = await supabase.auth.getUser();

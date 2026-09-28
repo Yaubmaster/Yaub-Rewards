@@ -5,7 +5,7 @@ import AdminMfaGate from '@/components/AdminMfaGate';
 // Solo correos en ADMIN_EMAILS (y espejados en rewards.admins, que es lo que
 // valida el RLS del lado de la base).
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
-  const supabase = supabaseServer();
+  const supabase = await supabaseServer();
   const {
     data: { user },
   } = await supabase.auth.getUser();

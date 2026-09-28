@@ -5,7 +5,7 @@ import { MisOfertasClient } from './MisOfertasClient';
 export const dynamic = 'force-dynamic';
 
 export default async function MisOfertas() {
-  const supabase = supabaseServer();
+  const supabase = await supabaseServer();
   const {
     data: { user },
   } = await supabase.auth.getUser();

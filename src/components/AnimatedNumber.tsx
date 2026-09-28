@@ -14,7 +14,7 @@ export function AnimatedNumber({
 }) {
   const [display, setDisplay] = useState(0);
   const fromRef = useRef(0);
-  const raf = useRef<number>();
+  const raf = useRef<number | undefined>(undefined);
 
   useEffect(() => {
     const from = fromRef.current;

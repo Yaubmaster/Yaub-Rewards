@@ -14,7 +14,7 @@ export async function empresaActiva(supabase: SupabaseClient, userId: string) {
     .order('created_at');
   const empresas = (data ?? []) as Empresa[];
   if (empresas.length === 0) return { empresa: null, empresas };
-  const pref = cookies().get(EMPRESA_COOKIE)?.value;
+  const pref = (await cookies()).get(EMPRESA_COOKIE)?.value;
   const empresa = empresas.find((e) => e.id === pref) ?? empresas[0];
   return { empresa, empresas };
 }
