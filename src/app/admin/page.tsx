@@ -5,7 +5,7 @@ import { AdminClient, type FreelancerResumen, type ReferidoAdmin } from './Admin
 export const dynamic = 'force-dynamic';
 
 export default async function Admin() {
-  const supabase = supabaseServer();
+  const supabase = await supabaseServer();
 
   const [{ data: empresas }, { data: referidos }, { data: freelancers }, { data: pagos }] =
     await Promise.all([

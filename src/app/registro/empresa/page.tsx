@@ -1,7 +1,7 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { use, useEffect, useState } from 'react';
 import { supabaseBrowser } from '@/lib/supabase/client';
 import { Icon, ICON_PATHS } from '@/components/icons';
 import { crearAgenteDeEmpresa } from '@/lib/crearAgenteEmpresa';
@@ -12,11 +12,11 @@ type Paso = 'datos' | 'oferta' | 'confirmar' | 'revision';
 export default function RegistroEmpresa({
   searchParams,
 }: {
-  searchParams?: { nueva?: string };
+  searchParams: Promise<{ nueva?: string }>;
 }) {
   const router = useRouter();
   // ?nueva=1 → agregar una empresa adicional a la oficina (multi-empresa)
-  const esNueva = searchParams?.nueva === '1';
+  const esNueva = use(searchParams).nueva === '1';
   const [paso, setPaso] = useState<Paso>('datos');
   // Si ya hay sesión (ej. un freelancer que abre su "segunda oficina"),
   // saltamos el alta de cuenta y solo pedimos los datos de la empresa.

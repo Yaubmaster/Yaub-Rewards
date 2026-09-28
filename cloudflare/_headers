@@ -1,0 +1,4 @@
+# Se copia a la raíz de .open-next/assets en `npm run build:cf` (con basePath,
+# lo que va en public/ termina bajo /rewards y Cloudflare no lo leería).
+/rewards/_next/static/*
+  Cache-Control: public,max-age=31536000,immutable

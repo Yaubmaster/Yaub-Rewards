@@ -4,7 +4,7 @@ Web app donde freelancers se registran, obtienen su código único de vendedor y
 comisiones por referidos. Las ventas las cierran los agentes de IA de Yaub, que registran
 los referidos vía API (Edge Functions de Supabase).
 
-- **Stack**: Next.js 14 (App Router) + Tailwind + Supabase (proyecto `yaub-platform-prod`).
+- **Stack**: Next.js 15 (App Router) + Tailwind + Supabase (proyecto `yaub-platform-prod`).
 - **Servida bajo** `yaub.ai/rewards` (basePath `/rewards`, dominio `rewards.yaub.ai`).
 - **Todo lo nuevo vive en el schema `rewards`** — el schema `public` existente no se toca.
 
@@ -25,27 +25,40 @@ npm install
 npm run dev                  # http://localhost:3000/rewards
 ```
 
-## Variables de entorno (Vercel)
+## Hosting: Cloudflare Workers (OpenNext)
+
+`rewards.yaub.ai` se sirve desde el Worker **`yaub-rewards`** con el adaptador
+[`@opennextjs/cloudflare`](https://opennext.js.org/cloudflare) (`wrangler.jsonc`,
+`open-next.config.ts`). Ya no vive en Vercel.
+
+**Deploy (manual, desde `main`):**
+
+```bash
+# .env.production.local (NO se commitea: el repo es público) con las variables públicas de build:
+#   NEXT_PUBLIC_SUPABASE_URL, NEXT_PUBLIC_SUPABASE_ANON_KEY, NEXT_PUBLIC_SITE_URL
+CLOUDFLARE_API_TOKEN=<token con Workers Scripts Edit> npm run deploy
+```
+
+`npm run deploy` = `next build` → bundle de OpenNext → copia `cloudflare/_headers` a la raíz
+de los assets (con `basePath`, lo de `public/` queda bajo `/rewards`) → `wrangler deploy`.
+`npm run preview` levanta lo mismo en local con el runtime de Workers.
 
 | Variable | Dónde | Notas |
 | --- | --- | --- |
-| `NEXT_PUBLIC_SUPABASE_URL` | Client + server | `https://xwjhuixuvmyzfhujvxhf.supabase.co` |
-| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Client + server | anon key del proyecto |
-| `SUPABASE_SERVICE_ROLE_KEY` | Solo server | opcional; la app funciona con RLS + RPCs sin ella |
-| `REWARDS_API_KEY` | Solo server | la misma key que usan los agentes (por si el server necesita llamar las functions) |
-| `ADMIN_EMAILS` | Solo server | correos con acceso a `/admin`, separados por coma |
-| `NEXT_PUBLIC_SITE_URL` | Client + server | `https://rewards.yaub.ai` |
+| `NEXT_PUBLIC_SUPABASE_URL` | Build (`.env.production.local`) | `https://xwjhuixuvmyzfhujvxhf.supabase.co` |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Build (`.env.production.local`) | anon key del proyecto (la misma de platform) |
+| `NEXT_PUBLIC_SITE_URL` | Build + `vars` del Worker | `https://rewards.yaub.ai` |
+| `ADMIN_EMAILS` | Secreto del Worker | correos con acceso a `/admin`, separados por coma (`npx wrangler secret put ADMIN_EMAILS`) |
 
 > El gate real de admin está en la base (tabla `rewards.admins` + RLS). `ADMIN_EMAILS`
 > gatea la ruta en el server de Next; mantén ambos en sincronía.
 
-## Deploy en Vercel
+No hay caché incremental: todo es `force-dynamic` salvo las páginas prerenderizadas
+(`/login`, `/registro…`), que se leen de los assets del Worker. El firewall (reto de bots,
+bloqueo de crawlers de IA) vive en la zona `yaub.ai` de Cloudflare.
 
-1. Proyecto nuevo en Vercel → importar este repo (framework: Next.js, sin overrides).
-2. Agregar las env vars de arriba.
-3. Domains → agregar `rewards.yaub.ai` (CNAME `cname.vercel-dns.com`).
-4. En Supabase → Authentication → URL Configuration → **Redirect URLs**, agregar:
-   `https://rewards.yaub.ai/rewards/auth/callback` y `https://yaub.ai/rewards/auth/callback`.
+En Supabase → Authentication → URL Configuration → **Redirect URLs** debe estar
+`https://rewards.yaub.ai/rewards/auth/callback`.
 
 ### Rewrite en el proyecto principal (yaub.ai)
 

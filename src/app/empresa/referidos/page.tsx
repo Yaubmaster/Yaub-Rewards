@@ -7,7 +7,7 @@ import { ReferidosEmpresaClient } from './ReferidosEmpresaClient';
 export const dynamic = 'force-dynamic';
 
 export default async function ReferidosEmpresa() {
-  const supabase = supabaseServer();
+  const supabase = await supabaseServer();
   const {
     data: { user },
   } = await supabase.auth.getUser();
